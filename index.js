@@ -1,11 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { User } = require('./schema'); // Import the User schema
+const { User } = require('./schema'); 
+const cors = require('cors'); 
 
 const app = express();
 const port = 3000;
 
-// Connect to MongoDB database
+
 mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mongodb.net/estate_db?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -15,15 +16,16 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
   console.error('Error connecting to MongoDB:', error);
 });
 
-// Middleware to parse JSON data
-app.use(express.json());
 
-// Signup endpoint
+app.use(express.json());
+app.use(cors());
+
+
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
-    // Check if user already exists
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'User already exists' });
@@ -44,18 +46,18 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// Login endpoint
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Check if user exists
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Check password
+
     if (user.password !== password) {
       return res.status(401).json({ error: 'Invalid password' });
     }
@@ -67,7 +69,8 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Start the server
+
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
