@@ -85,6 +85,17 @@ app.post('/listings', async (req, res) => {
   }
 });
 
+app.get('/added-listings', async (req, res) => {
+  try {
+      // Fetch all listings from the database
+      const listings = await Listing.find();
+      res.status(200).json(listings);
+  } catch (error) {
+      console.error('Error fetching listings:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
