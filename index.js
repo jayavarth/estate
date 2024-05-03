@@ -19,7 +19,6 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-// User Signup
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -65,7 +64,7 @@ app.post('/login', async (req, res) => {
 app.post('/listings', async (req, res) => {
   try {
       const { ownerType, fullName, phoneNumber, location, images } = req.body;
-      const userId = req.userId; // Assuming you have the user's ID stored in req.userId after authentication
+      const userId = req.userId; 
 
       const newListing = new Listing({
           ownerType,
@@ -73,7 +72,7 @@ app.post('/listings', async (req, res) => {
           phoneNumber,
           location,
           images,
-          user: userId // Store the user's unique identifier with the listing
+          user: userId
       });
 
       await newListing.save();
@@ -88,10 +87,8 @@ app.post('/listings', async (req, res) => {
 
 app.get('/added-listings', async (req, res) => {
   try {
-    // Extract the user ID from the request (assuming it's stored in req.user)
-    const userId = req.User._id; // Replace with the appropriate field name
+    const userId = req.userId;
 
-    // Fetch only listings created by the current user
     const listings = await Listing.find({ userId });
 
     res.status(200).json(listings);
