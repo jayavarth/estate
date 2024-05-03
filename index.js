@@ -85,16 +85,22 @@ app.post('/listings', async (req, res) => {
   }
 });
 
+
 app.get('/added-listings', async (req, res) => {
   try {
-      // Fetch all listings from the database
-      const listings = await Listing.find();
-      res.status(200).json(listings);
+    // Extract the user ID from the request (assuming it's stored in req.user)
+    const userId = req.User._id; // Replace with the appropriate field name
+
+    // Fetch only listings created by the current user
+    const listings = await Listing.find({ userId });
+
+    res.status(200).json(listings);
   } catch (error) {
-      console.error('Error fetching listings:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching user listings:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.listen(port, () => {
