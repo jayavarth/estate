@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { User } = require('./schema'); 
 const { Listing } = require('./schema_list'); 
 const cors = require('cors'); 
+const path = require('path');
 
 const app = express();
 const port = 3000;
@@ -18,6 +19,7 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 
 app.use(express.json());
 app.use(cors());
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
@@ -83,7 +85,6 @@ app.post('/listings', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 app.get('/added-listings', async (req, res) => {
   try {
