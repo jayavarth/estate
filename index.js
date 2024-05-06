@@ -64,7 +64,12 @@ app.post('/login', async (req, res) => {
 app.post('/listings', async (req, res) => {
   try {
       const { ownerType, fullName, phoneNumber, location, images } = req.body;
+      // Assuming you have a middleware function to extract user ID from the request
       const userId = req.userId; 
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized: User ID not provided' });
+      }
 
       const newListing = new Listing({
           ownerType,
@@ -85,19 +90,17 @@ app.post('/listings', async (req, res) => {
 });
 
 
+
 app.get('/added-listings', async (req, res) => {
   try {
-    const userId = req.userId;
-
-    const listings = await Listing.find({ userId });
-
-    res.status(200).json(listings);
+      // Fetch all listings from the database
+      const listings = await Listing.find();
+      res.status(200).json(listings);
   } catch (error) {
-    console.error('Error fetching user listings:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error fetching listings:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 app.listen(port, () => {
