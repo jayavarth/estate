@@ -85,18 +85,20 @@ app.post('/listings', async (req, res) => {
 });
 
 
-app.get('/added-listings', async (req, res) => {
+
+app.get('/listings', async (req, res) => {
   try {
-    const userId = req.userId;
+      const userId = req.userId;
 
-    const listings = await Listing.find({ user: userId });
+      const listings = await Listing.find({ user: userId });
 
-    res.status(200).json(listings);
+      res.status(200).json(listings);
   } catch (error) {
-    console.error('Error fetching user listings:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error fetching user listings:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
