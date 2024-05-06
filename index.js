@@ -89,7 +89,7 @@ app.get('/added-listings', async (req, res) => {
   try {
     const userId = req.userId;
 
-    const listings = await Listing.find({ userId });
+    const listings = await Listing.find({ user: userId });
 
     res.status(200).json(listings);
   } catch (error) {
@@ -97,6 +97,7 @@ app.get('/added-listings', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
