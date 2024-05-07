@@ -19,6 +19,26 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
+// Middleware to extract user ID
+const extractUserId = async (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const user = await User.findOne({ token });
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = user._id;
+    next();
+  } catch (error) {
+    console.error('Error extracting user ID:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
