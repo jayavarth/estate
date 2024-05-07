@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { User } = require('./schema'); 
-const { Listing } = require('./schema_list'); 
-const cors = require('cors'); 
+const { User } = require('./schema');
+const { Listing } = require('./schema_list');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
