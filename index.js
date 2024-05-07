@@ -58,10 +58,10 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/listings', async (req, res) => {
+app.post('/listings', extractUserId, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images, propertyType, cost, detailedAddress, nearbyFacilities, area } = req.body;
-    const userId = req.headers.userid; // Assuming user ID is passed in request headers
+    const userId = req.userId;
 
     const newListing = new Listing({
       ownerType,
