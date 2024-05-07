@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const cors = require('cors');
@@ -27,11 +28,13 @@ const extractUserId = async (req, res, next) => {
   }
 
   try {
-    const user = await User.findOne({ token });
+    const decoded = jwt.verify(token, 'your-secret-key');
+    const userId = decoded.userId;
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    req.userId = user._id;
+    req.userId = userId;
     next();
   } catch (error) {
     console.error('Error extracting user ID:', error);
@@ -71,7 +74,10 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    res.status(200).json({ message: 'Login successful', userId: user._id });
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+
+    res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
