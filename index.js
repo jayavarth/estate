@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { User } = require('./schema');
-const { Listing } = require('./schema_list');
-const cors = require('cors');
+const { User } = require('./schema'); 
+const { Listing } = require('./schema_list'); 
+const cors = require('cors'); 
 
 const app = express();
 const port = 3000;
@@ -39,21 +39,22 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// User Login
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
 
+
     if (user.password !== password) {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // In a real-world scenario, you would generate a JWT token here and send it back to the client
     res.status(200).json({ message: 'Login successful' });
   } catch (error) {
     console.error('Error logging in:', error);
@@ -61,43 +62,40 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Create a new listing (requires authentication)
 app.post('/listings', async (req, res) => {
   try {
-    // Extract user ID from the request (assuming it's included in the request headers after authentication)
-    const userId = req.headers.authorization; // Modify this line to extract the user ID from the request headers
+      const { ownerType, fullName, phoneNumber, location, images } = req.body;
+      const userId = req.userId; // Assuming you have the user's ID stored in req.userId after authentication
 
-    const { ownerType, fullName, phoneNumber, location, images } = req.body;
+      const newListing = new Listing({
+          ownerType,
+          fullName,
+          phoneNumber,
+          location,
+          images,
+          user: userId // Store the user's unique identifier with the listing
+      });
 
-    const newListing = new Listing({
-      ownerType,
-      fullName,
-      phoneNumber,
-      location,
-      images,
-      user: userId // Associate the listing with the authenticated user
-    });
+      await newListing.save();
 
-    await newListing.save();
-
-    res.status(201).json({ message: 'Listing created successfully' });
+      res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
-    console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error creating listing:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Fetch all listings
 app.get('/added-listings', async (req, res) => {
   try {
-    // Fetch all listings from the database
-    const listings = await Listing.find();
-    res.status(200).json(listings);
+      // Fetch all listings from the database
+      const listings = await Listing.find();
+      res.status(200).json(listings);
   } catch (error) {
-    console.error('Error fetching listings:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error fetching listings:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
