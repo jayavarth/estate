@@ -21,7 +21,6 @@ const listingSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
-    // Add a field to store the user's unique identifier
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
