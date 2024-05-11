@@ -19,6 +19,22 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
+// Authentication middleware
+const requireLogin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user || user.password !== password) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = user._id; // Store the user ID in the request object
+    next();
+  } catch (error) {
+    console.error('Error authenticating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // User Signup
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
@@ -40,38 +56,18 @@ app.post('/signup', async (req, res) => {
 });
 
 
-app.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-
-    if (user.password !== password) {
-      return res.status(401).json({ error: 'Invalid password' });
-    }
-
-    res.status(200).json({ message: 'Login successful' });
-  } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
+// User Login
+app.post('/login', requireLogin, (req, res) => {
+  res.status(200).json({ message: 'Login successful' });
 });
 
-app.post('/listings', async (req, res) => {
+// Create Listing
+app.post('/listings', requireLogin, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images } = req.body;
 
-    // Assuming you have the user's ID stored in req.userId after authentication
+    // Get the user ID from the request object
     const userId = req.userId;
-
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
 
     const newListing = new Listing({
       ownerType,
@@ -79,7 +75,7 @@ app.post('/listings', async (req, res) => {
       phoneNumber,
       location,
       images,
-      user: userId // Store the user's unique identifier with the listing
+      user: userId 
     });
 
     await newListing.save();
@@ -92,18 +88,22 @@ app.post('/listings', async (req, res) => {
 });
 
 
-app.get('/added-listings', async (req, res) => {
+// Fetch Added Listings
+app.get('/added-listings', requireLogin, async (req, res) => {
   try {
-      // Fetch all listings from the database
-      const listings = await Listing.find();
-      res.status(200).json(listings);
+    // Get the user ID from the request object
+    const userId = req.userId;
+
+    // Fetch only the listings associated with the authenticated user's ID
+    const listings = await Listing.find({ user: userId });
+
+    res.status(200).json(listings);
   } catch (error) {
-      console.error('Error fetching listings:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching listings:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
-}); 
+});
