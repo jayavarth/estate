@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { User } = require('./schema'); 
-const { Listing } = require('./schema_list'); 
-const cors = require('cors'); 
+const { User } = require('./schema');
+const { Listing } = require('./schema_list');
+const cors = require('cors');
 
 const app = express();
 const port = 3000;
@@ -18,22 +18,6 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 
 app.use(express.json());
 app.use(cors());
-
-// Authentication middleware
-const requireLogin = async (req, res, next) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user || user.password !== password) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    req.userId = user._id; // Store the user ID in the request object
-    next();
-  } catch (error) {
-    console.error('Error authenticating user:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
 
 // User Signup
 app.post('/signup', async (req, res) => {
@@ -55,19 +39,43 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-
 // User Login
-app.post('/login', requireLogin, (req, res) => {
-  res.status(200).json({ message: 'Login successful' });
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.password !== password) {
+      return res.status(401).json({ error: 'Invalid password' });
+    }
+
+    // For simplicity, you can use a session-based authentication approach
+    req.session.userId = user._id;
+
+    res.status(200).json({ message: 'Login successful' });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
-// Create Listing
+// Middleware to check if user is authenticated
+const requireLogin = (req, res, next) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  next();
+};
+
+// Create listing
 app.post('/listings', requireLogin, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images } = req.body;
-
-    // Get the user ID from the request object
-    const userId = req.userId;
+    const userId = req.session.userId; // Get user ID from session
 
     const newListing = new Listing({
       ownerType,
@@ -75,7 +83,7 @@ app.post('/listings', requireLogin, async (req, res) => {
       phoneNumber,
       location,
       images,
-      user: userId 
+      user: userId
     });
 
     await newListing.save();
@@ -87,19 +95,16 @@ app.post('/listings', requireLogin, async (req, res) => {
   }
 });
 
-
-// Fetch Added Listings
+// Fetch user's listings
 app.get('/added-listings', requireLogin, async (req, res) => {
   try {
-    // Get the user ID from the request object
-    const userId = req.userId;
+    const userId = req.session.userId; // Get user ID from session
 
-    // Fetch only the listings associated with the authenticated user's ID
     const listings = await Listing.find({ user: userId });
 
     res.status(200).json(listings);
   } catch (error) {
-    console.error('Error fetching listings:', error);
+    console.error('Error fetching user listings:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
