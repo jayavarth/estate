@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 const port = 3000;
@@ -53,29 +54,37 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // For simplicity, you can use a session-based authentication approach
-    req.session.userId = user._id;
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// Middleware to check if user is authenticated
-const requireLogin = (req, res, next) => {
-  if (!req.session.userId) {
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-  next();
+
+  jwt.verify(token, 'secret', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = decoded.userId;
+    next();
+  });
 };
 
 // Create listing
-app.post('/listings', requireLogin, async (req, res) => {
+app.post('/listings', verifyToken, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images } = req.body;
-    const userId = req.session.userId; // Get user ID from session
+    const userId = req.userId;
 
     const newListing = new Listing({
       ownerType,
@@ -96,12 +105,10 @@ app.post('/listings', requireLogin, async (req, res) => {
 });
 
 // Fetch user's listings
-app.get('/added-listings', requireLogin, async (req, res) => {
+app.get('/added-listings', verifyToken, async (req, res) => {
   try {
-    const userId = req.session.userId; // Get user ID from session
-
+    const userId = req.userId;
     const listings = await Listing.find({ user: userId });
-
     res.status(200).json(listings);
   } catch (error) {
     console.error('Error fetching user listings:', error);
