@@ -20,7 +20,7 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-// User Signup
+
 app.post('/signup', async (req, res) => {
   const { username, email, password } = req.body;
 
@@ -40,7 +40,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// User Login
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -54,7 +54,6 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
     res.status(200).json({ message: 'Login successful', token });
@@ -64,7 +63,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Middleware to verify JWT token
+
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
@@ -80,7 +79,7 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// Create listing
+
 app.post('/listings', verifyToken, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images } = req.body;
@@ -104,7 +103,6 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-// Fetch user's listings
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;

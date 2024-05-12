@@ -1,3 +1,4 @@
+// schema_list.js
 const mongoose = require('mongoose');
 
 const listingSchema = new mongoose.Schema({
@@ -23,10 +24,11 @@ const listingSchema = new mongoose.Schema({
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true // Ensures every listing is associated with a user
     }
 });
 
 const Listing = mongoose.model('Listing', listingSchema);
 
-module.exports = {Listing};
+module.exports = Listing;
