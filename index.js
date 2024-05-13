@@ -43,6 +43,7 @@ app.post('/signup', async (req, res) => {
 
 
 // User Login
+// User Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -69,6 +70,7 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 const verifyToken = (req, res, next) => {
