@@ -43,6 +43,7 @@ app.post('/signup', async (req, res) => {
 
 
 // User Login
+// User Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -56,15 +57,20 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
+    // Get the user type from the found user
+    const userType = user.userType;
+
     // Generate JWT token
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
-    res.status(200).json({ message: 'Login successful', token });
+    // Return the user type along with the token
+    res.status(200).json({ message: 'Login successful', token, userType });
   } catch (error) {
     console.error('Error logging in:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
