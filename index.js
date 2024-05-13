@@ -21,24 +21,26 @@ app.use(express.json());
 app.use(cors());
 
 // User Signup
+
 app.post('/signup', async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, userType } = req.body; // Get userType from request body
 
   try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
-    }
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+          return res.status(400).json({ error: 'User already exists' });
+      }
 
-    const newUser = new User({ username, email, password });
-    await newUser.save();
+      const newUser = new User({ username, email, password, userType }); // Include userType when creating new user
+      await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully' });
+      res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error creating user:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // User Login
 app.post('/login', async (req, res) => {
