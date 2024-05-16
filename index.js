@@ -64,27 +64,27 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Middleware to verify token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization;
-  if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+      return res.status(401).json({ error: 'Unauthorized' });
   }
 
+  const token = authHeader.split(' ')[1]; 
   jwt.verify(token, 'secret', (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    req.userId = decoded.userId;
-    next();
+      if (err) {
+          return res.status(401).json({ error: 'Unauthorized' });
+      }
+      req.userId = decoded.userId;
+      next();
   });
 };
 
-// Create a new listing
+
 app.post('/listings', verifyToken, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
-    const userId = req.userId;  // Extracted from the token
+    const userId = req.userId;  
 
     const newListing = new Listing({
       ownerType,
@@ -95,7 +95,7 @@ app.post('/listings', verifyToken, async (req, res) => {
       propertyType,
       buildingType,
       cost,
-      user: userId  // Set user ID from the token
+      user: userId  
     });
 
     await newListing.save();
@@ -107,10 +107,10 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-// Get added listings for the authenticated user
+
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
-    const userId = req.userId;  // Extracted from the token
+    const userId = req.userId;  
     const listings = await Listing.find({ user: userId });
     res.status(200).json(listings);
   } catch (error) {
