@@ -81,10 +81,9 @@ const verifyToken = (req, res, next) => {
 };
 
 
-app.post('/listings', verifyToken, async (req, res) => {
+app.post('/listings/:id', verifyToken, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
-    const userId = req.userId;  
 
     const newListing = new Listing({
       ownerType,
@@ -95,7 +94,6 @@ app.post('/listings', verifyToken, async (req, res) => {
       propertyType,
       buildingType,
       cost,
-      user: userId  
     });
 
     await newListing.save();
@@ -108,10 +106,9 @@ app.post('/listings', verifyToken, async (req, res) => {
 });
 
 
-app.get('/added-listings', verifyToken, async (req, res) => {
+app.get('/added-listings/:id', verifyToken, async (req, res) => {
   try {
-    const userId = req.userId;  
-    const listings = await Listing.find({ user: userId });
+    const listings = await Listing.find();
     res.status(200).json(listings);
   } catch (error) {
     console.error('Error fetching user listings:', error);
