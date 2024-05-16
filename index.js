@@ -20,28 +20,27 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-
-
+// User Registration
 app.post('/signup', async (req, res) => {
-  const { username, email, password, userType } = req.body; 
+  const { username, email, password, userType } = req.body;
 
   try {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-          return res.status(400).json({ error: 'User already exists' });
-      }
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
 
-      const newUser = new User({ username, email, password, userType }); 
-      await newUser.save();
+    const newUser = new User({ username, email, password, userType });
+    await newUser.save();
 
-      res.status(201).json({ message: 'User created successfully' });
+    res.status(201).json({ message: 'User created successfully' });
   } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error creating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-
+// User Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -56,7 +55,6 @@ app.post('/login', async (req, res) => {
     }
 
     const userType = user.userType;
-
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
     res.status(200).json({ message: 'Login successful', token, userType });
@@ -66,28 +64,27 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
-
+// Middleware to verify token
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   jwt.verify(token, 'secret', (err, decoded) => {
-      if (err) {
-          return res.status(401).json({ error: 'Unauthorized' });
-      }
-      req.userId = decoded.userId;
-      next();
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = decoded.userId;
+    next();
   });
 };
 
-
+// Create a new listing
 app.post('/listings', verifyToken, async (req, res) => {
   try {
-    const { ownerType, fullName, phoneNumber, location, images } = req.body;
-    const userId = req.userId;
+    const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
+    const userId = req.userId;  // Extracted from the token
 
     const newListing = new Listing({
       ownerType,
@@ -95,7 +92,10 @@ app.post('/listings', verifyToken, async (req, res) => {
       phoneNumber,
       location,
       images,
-      user: userId
+      propertyType,
+      buildingType,
+      cost,
+      user: userId  // Set user ID from the token
     });
 
     await newListing.save();
@@ -107,10 +107,10 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-
+// Get added listings for the authenticated user
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.userId;  // Extracted from the token
     const listings = await Listing.find({ user: userId });
     res.status(200).json(listings);
   } catch (error) {
