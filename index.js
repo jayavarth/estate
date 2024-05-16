@@ -20,10 +20,10 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-// User Signup
+
 
 app.post('/signup', async (req, res) => {
-  const { username, email, password, userType } = req.body; // Get userType from request body
+  const { username, email, password, userType } = req.body; 
 
   try {
       const existingUser = await User.findOne({ email });
@@ -31,7 +31,7 @@ app.post('/signup', async (req, res) => {
           return res.status(400).json({ error: 'User already exists' });
       }
 
-      const newUser = new User({ username, email, password, userType }); // Include userType when creating new user
+      const newUser = new User({ username, email, password, userType }); 
       await newUser.save();
 
       res.status(201).json({ message: 'User created successfully' });
@@ -42,8 +42,6 @@ app.post('/signup', async (req, res) => {
 });
 
 
-// User Login
-// User Login
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -57,13 +55,10 @@ app.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
-    // Get the user type from the found user
     const userType = user.userType;
 
-    // Generate JWT token
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
-    // Return the user type along with the token
     res.status(200).json({ message: 'Login successful', token, userType });
   } catch (error) {
     console.error('Error logging in:', error);
@@ -88,7 +83,7 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-// Create listing
+
 app.post('/listings', verifyToken, async (req, res) => {
   try {
     const { ownerType, fullName, phoneNumber, location, images } = req.body;
@@ -112,7 +107,7 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-// Fetch user's listings
+
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;

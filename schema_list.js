@@ -21,6 +21,18 @@ const listingSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
+    propertyType: {
+        type: String,
+        required: true
+    },
+    buildingType: {
+        type: String,
+        required: true
+    },
+    cost: { 
+        type: String,
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -29,4 +41,4 @@ const listingSchema = new mongoose.Schema({
 
 const Listing = mongoose.model('Listing', listingSchema);
 
-module.exports = {Listing};
+module.exports = { Listing };

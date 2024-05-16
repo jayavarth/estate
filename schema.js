@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    username: {
+    username: { 
         type: String,
         required: true
     },
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    userType: { // Add userType field to store the user type
+    userType: { 
         type: String,
         required: true
     }
