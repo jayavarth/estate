@@ -68,49 +68,50 @@ app.post('/login', async (req, res) => {
 const verifyToken = (req, res, next) => {
   const token = req.query.token;
   if (!token) {
-      return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 
   jwt.verify(token, 'secret', (err, decoded) => {
-      if (err) {
-          return res.status(401).json({ error: 'Unauthorized' });
-      }
-      req.userId = decoded.userId;
-      next();
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = decoded.userId;
+    next();
   });
 };
 
 
+
 app.post('/listings', verifyToken, async (req, res) => {
   try {
-      const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
-      const userId = req.userId;  
-  
-      const newListing = new Listing({
-        ownerType,
-        fullName,
-        phoneNumber,
-        location,
-        images,
-        propertyType,
-        buildingType,
-        cost,
-        user: userId  
-      });
-  
-      await newListing.save();
-  
-      res.status(201).json({ message: 'Listing created successfully' });
+    const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
+    const userId = req.userId;
+
+    const newListing = new Listing({
+      ownerType,
+      fullName,
+      phoneNumber,
+      location,
+      images,
+      propertyType,
+      buildingType,
+      cost,
+      user: userId
+    });
+
+    await newListing.save();
+
+    res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
-      console.error('Error creating listing:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error creating listing:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
-    const userId = req.userId;  
+    const userId = req.userId;
     const listings = await Listing.find({ user: userId });
     res.status(200).json(listings);
   } catch (error) {
@@ -118,6 +119,7 @@ app.get('/added-listings', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
