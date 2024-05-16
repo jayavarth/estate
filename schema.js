@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    userType: { // Add userType field to store the user type
+        type: String,
+        required: true
     }
 });
 

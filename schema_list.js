@@ -32,6 +32,10 @@ const listingSchema = new mongoose.Schema({
     cost: { 
         type: String,
         required: true
+    },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
