@@ -20,7 +20,7 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-// User Registration
+
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
 
@@ -40,7 +40,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-// User Login
+
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -64,13 +64,13 @@ app.post('/login', async (req, res) => {
   }
 });
 
+
 const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
+  const token = req.query.token;
+  if (!token) {
       return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const token = authHeader.split(' ')[1]; 
   jwt.verify(token, 'secret', (err, decoded) => {
       if (err) {
           return res.status(401).json({ error: 'Unauthorized' });
@@ -83,27 +83,27 @@ const verifyToken = (req, res, next) => {
 
 app.post('/listings', verifyToken, async (req, res) => {
   try {
-    const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
-    const userId = req.userId;  
-
-    const newListing = new Listing({
-      ownerType,
-      fullName,
-      phoneNumber,
-      location,
-      images,
-      propertyType,
-      buildingType,
-      cost,
-      user: userId  
-    });
-
-    await newListing.save();
-
-    res.status(201).json({ message: 'Listing created successfully' });
+      const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
+      const userId = req.userId;  
+  
+      const newListing = new Listing({
+        ownerType,
+        fullName,
+        phoneNumber,
+        location,
+        images,
+        propertyType,
+        buildingType,
+        cost,
+        user: userId  
+      });
+  
+      await newListing.save();
+  
+      res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
-    console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error creating listing:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
 
