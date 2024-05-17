@@ -6,7 +6,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mongodb.net/estate_db?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
@@ -19,6 +19,7 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 
 app.use(express.json());
 app.use(cors());
+
 
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
