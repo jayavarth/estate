@@ -20,7 +20,6 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
 
@@ -39,7 +38,6 @@ app.post('/signup', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -64,7 +62,6 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
 const verifyToken = (req, res, next) => {
   const token = req.query.token;
   if (!token) {
@@ -79,8 +76,6 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
-
-
 
 app.post('/listings', verifyToken, async (req, res) => {
   try {
@@ -108,7 +103,6 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
@@ -120,6 +114,38 @@ app.get('/added-listings', verifyToken, async (req, res) => {
   }
 });
 
+app.get('/all-listings', async (req, res) => {
+  try {
+    const listings = await Listing.find();
+    res.status(200).json(listings);
+  } catch (error) {
+    console.error('Error fetching listings:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/search-listings', async (req, res) => {
+  try {
+    const { bhk, location, propertyType } = req.query;
+    let filter = {};
+
+    if (bhk) {
+      filter.buildingType = bhk;
+    }
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+    if (propertyType) {
+      filter.propertyType = propertyType;
+    }
+
+    const listings = await Listing.find(filter);
+    res.status(200).json(listings);
+  } catch (error) {
+    console.error('Error fetching search results:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
