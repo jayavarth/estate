@@ -66,67 +66,73 @@ app.post('/login', async (req, res) => {
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.query.token || req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
+      return res.status(401).json({ error: 'Unauthorized' });
   }
 
   jwt.verify(token, 'secret', (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    req.userId = decoded.userId;
-    next();
+      if (err) {
+          return res.status(401).json({ error: 'Unauthorized' });
+      }
+      req.userId = decoded.userId;
+      next();
   });
 };
+
 
 // Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
   try {
-    const {
-      ownerType,
-      propertyType,
-      buildingType,
-      saleType,
-      timeToContact,
-      Age,
-      phoneNumber,
-      location,
-      landmark,
-      streetName,
-      sqft,
-      parkingOption,
-      images,
-      cost
-    } = req.body;
-    const userId = req.userId;
+      const {
+          ownerType,
+          propertyType,
+          buildingType,
+          saleType,
+          timeToContact,
+          Age,
+          phoneNumber,
+          location,
+          landmark,
+          streetName,
+          sqft,
+          parkingOption,
+          images,
+          cost
+      } = req.body;
+      const userId = req.userId;
 
-    const newListing = new Listing({
-      ownerType,
-      propertyType,
-      buildingType,
-      saleType,
-      timeToContact,
-      Age,
-      phoneNumber,
-      location,
-      landmark,
-      streetName,
-      sizeOrUnit: sqft,
-      parkingOption,
-      images,
-      cost,
-      user: userId
-    });
+      if (!userId) {
+          return res.status(401).json({ error: 'Unauthorized' });
+      }
 
-    await newListing.save();
+      const newListing = new Listing({
+          ownerType,
+          propertyType,
+          buildingType,
+          saleType,
+          timeToContact,
+          Age,
+          phoneNumber,
+          location,
+          landmark,
+          streetName,
+          sizeOrUnit: sqft,
+          parkingOption,
+          images,
+          cost,
+          user: userId
+      });
 
-    res.status(201).json({ message: 'Listing created successfully' });
+      await newListing.save();
+
+      res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
-    console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error creating listing:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Retrieve user's listings endpoint
