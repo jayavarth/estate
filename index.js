@@ -4,7 +4,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const { User } = require('./schema');
-const Listing = require('./schema_list');  // Correct the import, no destructuring needed
+const {Listing} = require('./schema_list');  // Correct the import, no destructuring needed
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -57,7 +57,7 @@ app.post('/login', async (req, res) => {
     }
 
     const userType = user.userType;
-    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '2h' });
 
     res.status(200).json({ message: 'Login successful', token, userType });
   } catch (error) {
