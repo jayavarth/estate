@@ -4,7 +4,8 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 
 const { User } = require('./schema');
-const {Listing} = require('./schema_list');  // Correct the import, no destructuring needed
+const { Listing } = require('./schema_list');
+
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -90,7 +91,7 @@ app.post('/listings', verifyToken, async (req, res) => {
       propertyType,
       buildingType,
       saleType,
-      timeToContact,
+      // timeToContact,
       Age,
       phoneNumber,
       location,
@@ -112,7 +113,7 @@ app.post('/listings', verifyToken, async (req, res) => {
       propertyType,
       buildingType,
       saleType,
-      timeToContact,
+      // timeToContact,
       Age,
       phoneNumber,
       location,
