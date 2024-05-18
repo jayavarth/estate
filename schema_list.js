@@ -49,6 +49,10 @@ const listingSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  saleType: {
+    type: String,
+    required: true
+  },
   cost: {
     type: Number,
     required: true
