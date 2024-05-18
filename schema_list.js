@@ -22,7 +22,7 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     sizeOrUnit: {
-        type: String,
+        type: Number, // Changed to number as it represents area in sq ft
         required: true
     },
     parkingOption: {
@@ -30,11 +30,11 @@ const listingSchema = new mongoose.Schema({
         required: true
     },
     timeToContact: {
-        type: String,
+        type: String, // Assuming this represents time as a string
         required: true
     },
     Age: {
-        type: String,
+        type: Number, // Changed to number as it represents age of the property
         required: false // Assuming this field is optional
     },
     images: {
@@ -50,7 +50,7 @@ const listingSchema = new mongoose.Schema({
         required: false
     },
     cost: {
-        type: String,
+        type: Number, // Changed to number as it represents cost
         required: true
     },
     // Assuming you have a User model with the name 'User'

@@ -112,11 +112,8 @@ app.post('/listings', verifyToken, async (req, res) => {
       location,
       landmark,
       streetName,
-      sizeOrUnit: sqft, // Changed to match backend schema
+      sizeOrUnit: sqft,
       parkingOption,
-      timeHour: "", // Add these lines if these fields are expected by the backend
-      timeMinute: "", // Add these lines if these fields are expected by the backend
-      timePeriod: "", // Add these lines if these fields are expected by the backend
       images,
       cost,
       user: userId
