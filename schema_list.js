@@ -5,10 +5,6 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    fullName: {
-        type: String,
-        required: true
-    },
     phoneNumber: {
         type: String,
         required: true
@@ -37,9 +33,9 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    contactDetail: {
+    Age: {
         type: String,
-        required: true
+        required: false // Assuming this field is optional
     },
     images: {
         type: [String],
@@ -51,12 +47,13 @@ const listingSchema = new mongoose.Schema({
     },
     buildingType: {
         type: String,
-        required: true
+        required: false
     },
-    cost: { 
+    cost: {
         type: String,
         required: true
     },
+    // Assuming you have a User model with the name 'User'
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -65,4 +62,4 @@ const listingSchema = new mongoose.Schema({
 
 const Listing = mongoose.model('Listing', listingSchema);
 
-module.exports = { Listing };
+module.exports = Listing;

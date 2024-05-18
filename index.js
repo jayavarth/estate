@@ -85,36 +85,39 @@ app.post('/listings', verifyToken, async (req, res) => {
   try {
     const {
       ownerType,
-      fullName,
+      propertyType,
+      buildingType,
+      saleType,
+      timeToContact,
+      Age,
       phoneNumber,
       location,
       landmark,
       streetName,
-      sizeOrUnit,
+      sqft,
       parkingOption,
-      timeToContact,
-      contactDetail,
       images,
-      propertyType,
-      buildingType,
       cost
     } = req.body;
     const userId = req.userId;
 
     const newListing = new Listing({
       ownerType,
-      fullName,
+      propertyType,
+      buildingType,
+      saleType,
+      timeToContact,
+      Age,
       phoneNumber,
       location,
       landmark,
       streetName,
-      sizeOrUnit,
+      sizeOrUnit: sqft, // Changed to match backend schema
       parkingOption,
-      timeToContact,
-      contactDetail,
+      timeHour: "", // Add these lines if these fields are expected by the backend
+      timeMinute: "", // Add these lines if these fields are expected by the backend
+      timePeriod: "", // Add these lines if these fields are expected by the backend
       images,
-      propertyType,
-      buildingType,
       cost,
       user: userId
     });
@@ -127,6 +130,7 @@ app.post('/listings', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Retrieve user's listings endpoint
 app.get('/added-listings', verifyToken, async (req, res) => {
