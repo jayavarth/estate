@@ -68,7 +68,7 @@ app.post('/login', async (req, res) => {
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+  const token = req.query.token || req.headers.authorization.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -118,7 +118,7 @@ app.post('/listings', verifyToken, async (req, res) => {
       location,
       landmark,
       streetName,
-      sizeOrUnit: sqft,
+      sqft,
       parkingOption,
       images,
       cost,
