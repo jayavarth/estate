@@ -17,6 +17,30 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    landmark: {
+        type: String,
+        required: true
+    },
+    streetName: {
+        type: String,
+        required: true
+    },
+    sizeOrUnit: {
+        type: String,
+        required: true
+    },
+    parkingOption: {
+        type: String,
+        required: true
+    },
+    timeToContact: {
+        type: String,
+        required: true
+    },
+    contactDetail: {
+        type: String,
+        required: true
+    },
     images: {
         type: [String],
         required: true

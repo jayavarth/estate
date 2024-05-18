@@ -20,7 +20,7 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-
+// Signup endpoint
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
 
@@ -40,6 +40,7 @@ app.post('/signup', async (req, res) => {
   }
 });
 
+// Login endpoint
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -63,8 +64,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
+// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.query.token;
+  const token = req.query.token || req.headers.authorization.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -78,9 +80,25 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+// Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
   try {
-    const { ownerType, fullName, phoneNumber, location, images, propertyType, buildingType, cost } = req.body;
+    const {
+      ownerType,
+      fullName,
+      phoneNumber,
+      location,
+      landmark,
+      streetName,
+      sizeOrUnit,
+      parkingOption,
+      timeToContact,
+      contactDetail,
+      images,
+      propertyType,
+      buildingType,
+      cost
+    } = req.body;
     const userId = req.userId;
 
     const newListing = new Listing({
@@ -88,6 +106,12 @@ app.post('/listings', verifyToken, async (req, res) => {
       fullName,
       phoneNumber,
       location,
+      landmark,
+      streetName,
+      sizeOrUnit,
+      parkingOption,
+      timeToContact,
+      contactDetail,
       images,
       propertyType,
       buildingType,
@@ -104,6 +128,7 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
+// Retrieve user's listings endpoint
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
@@ -115,6 +140,7 @@ app.get('/added-listings', verifyToken, async (req, res) => {
   }
 });
 
+// Retrieve all listings endpoint
 app.get('/all-listings', async (req, res) => {
   try {
     const listings = await Listing.find();
@@ -125,6 +151,7 @@ app.get('/all-listings', async (req, res) => {
   }
 });
 
+// Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType } = req.query;
