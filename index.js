@@ -130,7 +130,7 @@ app.post('/listings', verifyToken, async (req, res) => {
     res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
     console.error('Error creating listing:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json(error);
   }
 });
 
