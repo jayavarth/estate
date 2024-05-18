@@ -29,10 +29,10 @@ const listingSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-//   timeToContact: {
-//     type: String,
-//     required: true
-//   },
+  timeToContact: {
+    type: String,
+    required: true
+  },
   Age: {
     type: Number,
     required: false
