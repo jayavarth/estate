@@ -41,7 +41,10 @@ const rentSchema = new mongoose.Schema({
         type: String,
         enum: ['Yes', 'No'],
         required: true
-    }
+    },user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
 });
 
 const Rental = mongoose.model('Rent', rentSchema);
