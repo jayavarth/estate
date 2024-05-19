@@ -39,7 +39,6 @@ const rentSchema = new mongoose.Schema({
     },
     parkingOption: {
         type: String,
-        enum: ['Yes', 'No'],
         required: true
     },user: {
         type: mongoose.Schema.Types.ObjectId,
