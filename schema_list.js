@@ -1,51 +1,37 @@
 const mongoose = require('mongoose');
 
 const listingSchema = new mongoose.Schema({
-  contactInformation: {
-    contactInformation: {
-      phoneNumber: {
-        type: String,
-        required: true,
-        validate: {
-          validator: function(v) {
-            // Define your regex pattern for phone number validation
-            const phoneRegex = /^\d{10}$/; // Example: 10 digits phone number pattern
-            return phoneRegex.test(v);
-          },
-          message: props => `${props.value} is not a valid phone number!`
-        }
-      },
-    },
-    timeToContact: {
-      type: String,
-      required: true,
-    }
+  ownerType: {
+    type: String,
+    required: true
   },
-  address: {
-    location: {
-      type: String,
-      required: true,
-      max:200// Add maximum length validation if needed
-    },
-    landmark: {
-      type: String,
-      required: true,
-      max:200// Add maximum length validation if needed
-    },
-    streetName: {
-      type: String,
-      required: true,
-      max:100// Add maximum length validation if needed
-    }
+  phoneNumber: {
+    type: String,
+    required: true
+  },
+  location: {
+    type: String,
+    required: true
+  },
+  landmark: {
+    type: String,
+    required: true
+  },
+  streetName: {
+    type: String,
+    required: true
   },
   sqft: {
     type: Number,
-    required: true,
-    min: 0 // Ensure sqft is a positive number
+    required: true
   },
   parkingOption: {
     type: String,
-    required: true,
+    required: true
+  },
+  timeToContact: {
+    type: String,
+    required: true
   },
   Age: {
     type: Number,
@@ -69,8 +55,7 @@ const listingSchema = new mongoose.Schema({
   },
   cost: {
     type: Number,
-    required: true,
-    min:0
+    required: true
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -78,9 +63,7 @@ const listingSchema = new mongoose.Schema({
   }
 });
 
-
 const Listing = mongoose.model('Listing', listingSchema);
 
 module.exports = {Listing};
-
 
