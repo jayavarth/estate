@@ -36,12 +36,16 @@ app.post('/signup', async (req, res) => {
     const newUser = new User({ username, email, password, userType });
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully' });
+    // Generate token for the newly signed up user
+    const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
+
+    res.status(201).json({ message: 'User created successfully', token });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Login endpoint
 app.post('/login', async (req, res) => {
