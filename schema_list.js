@@ -47,7 +47,7 @@ const listingSchema = new mongoose.Schema({
   },
   buildingType: {
     type: String,
-    required: false
+    required: true
   },
   saleType: {
     type: String,
