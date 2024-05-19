@@ -23,27 +23,6 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 app.use(express.json());
 app.use(cors());
 
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Unauthorized: No authorization header provided' });
-  }
-
-  const token = authHeader.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ error: 'Unauthorized: No token provided' });
-  }
-
-  jwt.verify(token, 'secret', (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
-    }
-    req.userId = decoded.userId;
-    next();
-  });
-};
-
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
@@ -58,7 +37,7 @@ app.post('/signup', async (req, res) => {
     await newUser.save();
 
     // Generate token for the newly signed up user
-    const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '4h' });
+    const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
 
     res.status(201).json({ message: 'User created successfully', token });
   } catch (error) {
@@ -66,7 +45,6 @@ app.post('/signup', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 // Login endpoint
 app.post('/login', async (req, res) => {
@@ -91,6 +69,24 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.query.token || req.headers.authorization.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, 'secret', (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
 
 
 
