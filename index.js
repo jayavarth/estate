@@ -177,7 +177,6 @@ app.post('/rentals', verifyToken, async (req, res) => {
       securityDeposit,
       ageOfProperty,
       parkingOption,
-      images,
     } = req.body;
     const userId = req.userId;
 
@@ -197,7 +196,6 @@ app.post('/rentals', verifyToken, async (req, res) => {
       securityDeposit,
       ageOfProperty,
       parkingOption,
-      images,
       user: userId
     });
 
