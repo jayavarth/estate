@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
+const { Rental } = require('./schema_rent');
 
 
 const app = express();
@@ -161,6 +162,79 @@ app.get('/all-listings', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Create rental endpoint
+app.post('/rentals', verifyToken, async (req, res) => {
+  try {
+    const {
+      propertyType,
+      buildingType,
+      location,
+      landmark,
+      streetName,
+      areaOccupied,
+      monthlyRent,
+      securityDeposit,
+      ageOfProperty,
+      parkingOption,
+      images,
+    } = req.body;
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    // Create a new rental object
+    const newRental = new Rental({
+      propertyType,
+      buildingType,
+      location,
+      landmark,
+      streetName,
+      areaOccupied,
+      monthlyRent,
+      securityDeposit,
+      ageOfProperty,
+      parkingOption,
+      images,
+      user: userId
+    });
+
+    // Save the new rental object to the database
+    await newRental.save();
+
+    res.status(201).json({ message: 'Rental property added successfully' });
+  } catch (error) {
+    console.error('Error adding rental property:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Retrieve user's rental properties endpoint
+app.get('/added-rentals', verifyToken, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const rentals = await Rental.find({ user: userId });
+    res.status(200).json(rentals);
+  } catch (error) {
+    console.error('Error fetching user rentals:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Retrieve all rental properties endpoint
+app.get('/all-rentals', async (req, res) => {
+  try {
+    const rentals = await Rental.find();
+    res.status(200).json(rentals);
+  } catch (error) {
+    console.error('Error fetching rentals:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
