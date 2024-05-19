@@ -41,8 +41,7 @@ const rentSchema = new mongoose.Schema({
         type: String,
         enum: ['Yes', 'No'],
         required: true
-    },
-    images: [String] // Assuming image URLs will be stored as strings
+    }
 });
 
 const Rental = mongoose.model('Rent', rentSchema);
