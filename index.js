@@ -132,6 +132,7 @@ app.post('/listings', verifyToken, async (req, res) => {
     const userId = req.userId;
 
     if (!userId) {
+      console.log(userId)
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
@@ -280,25 +281,9 @@ app.get('/search-listings', async (req, res) => {
 
 
 app.post('/upload', upload.array('images'), (req, res) => {
-  try {
-      // Ensure only authenticated users can upload images
-      if (!req.userId) {
-          return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      // Extract uploaded image URLs
-      const imageUrls = req.files.map(file => file.path);
-
-      // Respond with success message and image URLs
-      res.status(200).json({ success: true, message: 'Images uploaded successfully', urls: imageUrls });
-  } catch (error) {
-      console.error('Error uploading images:', error);
-      // Handle upload errors and respond with an appropriate error message
-      res.status(500).json({ success: false, message: 'Internal server error' });
-  }
+  const imageUrls = req.files.map(file => file.path);
+  res.json({ urls: imageUrls });
 });
-
-
 
 
 // Ensure server is listening on the correct port
