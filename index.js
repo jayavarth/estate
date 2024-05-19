@@ -1,7 +1,12 @@
+require('dotenv').config(); // Load environment variables from .env file
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
@@ -11,7 +16,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mongodb.net/estate_db?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -20,8 +25,43 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
   console.error('Error connecting to MongoDB:', error);
 });
 
-app.use(express.json());
-app.use(cors());
+// Middleware
+app.use(express.json()); // Parse JSON request bodies
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'property_images',
+    allowed_formats: ['jpg', 'png']
+  }
+});
+
+const upload = multer({ storage: storage });
+
+// Middleware to verify JWT token
+const verifyToken = (req, res, next) => {
+  const token = req.query.token || req.headers.authorization && req.headers.authorization.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    req.userId = decoded.userId;
+    next();
+  });
+};
+
 
 // Signup endpoint
 app.post('/signup', async (req, res) => {
@@ -69,26 +109,6 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-// Middleware to verify JWT token
-const verifyToken = (req, res, next) => {
-  const token = req.query.token || req.headers.authorization.split(' ')[1];
-  if (!token) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  jwt.verify(token, 'secret', (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    req.userId = decoded.userId;
-    next();
-  });
-};
-
-
-
 
 // Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
@@ -234,8 +254,6 @@ app.get('/all-rentals', async (req, res) => {
   }
 });
 
-
-
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
@@ -259,6 +277,13 @@ app.get('/search-listings', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+app.post('/upload', upload.array('images'), (req, res) => {
+  const imageUrls = req.files.map(file => file.path);
+  res.json({ urls: imageUrls });
+});
+
 
 // Ensure server is listening on the correct port
 app.listen(port, () => {
