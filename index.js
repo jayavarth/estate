@@ -279,7 +279,7 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
-app.delete('/added-rentals/:id', (req, res) => {
+app.delete('/rentals/:id', (req, res) => {
   const id = parseInt(req.params.id);
   
   // Find the index of the rental with the given ID
