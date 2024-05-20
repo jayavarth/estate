@@ -62,7 +62,6 @@ const verifyToken = (req, res, next) => {
   });
 };
 
-
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
@@ -77,7 +76,7 @@ app.post('/signup', async (req, res) => {
     await newUser.save();
 
     // Generate token for the newly signed up user
-    const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '2h' });
 
     res.status(201).json({ message: 'User created successfully', token });
   } catch (error) {
@@ -101,7 +100,7 @@ app.post('/login', async (req, res) => {
     }
 
     const userType = user.userType;
-    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '4h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '4h' });
 
     res.status(200).json({ message: 'Login successful', token, userType });
   } catch (error) {
@@ -135,15 +134,8 @@ app.post('/listings', verifyToken, upload.array('images'), async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Upload images to Cloudinary
-    const uploadPromises = req.files.map(file => {
-      return cloudinary.uploader.upload(file.path);
-    });
-
-    const uploadedImages = await Promise.all(uploadPromises);
-
     // Extract URLs from uploaded images
-    const imageUrls = uploadedImages.map(upload => upload.secure_url);
+    const imageUrls = req.files.map(file => file.path);
 
     const newListing = new Listing({
       ownerType,
@@ -171,6 +163,7 @@ app.post('/listings', verifyToken, upload.array('images'), async (req, res) => {
     res.status(500).json(error);
   }
 });
+
 // Retrieve user's listings endpoint
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
@@ -287,12 +280,11 @@ app.get('/search-listings', async (req, res) => {
   }
 });
 
-
+// Image upload endpoint
 app.post('/upload', upload.array('images'), (req, res) => {
   const imageUrls = req.files.map(file => file.path);
   res.json({ urls: imageUrls });
 });
-
 
 // Ensure server is listening on the correct port
 app.listen(port, () => {
