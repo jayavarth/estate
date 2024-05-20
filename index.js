@@ -202,14 +202,18 @@ app.post('/rentals', verifyToken, async (req, res) => {
     });
 
     // Save the new rental object to the database
-    await newRental.save();
+    const savedRental = await newRental.save();
 
-    res.status(201).json({ message: 'Rental property added successfully' });
+    res.status(201).json({ 
+      message: 'Rental property added successfully',
+      rentalId: savedRental._id // Include the rental ID in the response
+    });
   } catch (error) {
     console.error('Error adding rental property:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Retrieve user's rental properties endpoint
 app.get('/added-rentals', verifyToken, async (req, res) => {
@@ -279,7 +283,7 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
-app.delete('/rentals/:id', async (req, res) => {
+app.delete('/rentals/:id', verifyToken, async (req, res) => {
   const id = req.params.id;
   
   try {
@@ -293,6 +297,7 @@ app.delete('/rentals/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Ensure server is listening on the correct port
