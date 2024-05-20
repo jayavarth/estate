@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const listingSchema = new mongoose.Schema({
+  id: {
+    type: mongoose.Schema.Types.ObjectId,
+    index: true,
+    required: true,
+    auto: true
+  },
   ownerType: {
     type: String,
     required: true

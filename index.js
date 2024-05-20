@@ -279,6 +279,21 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
+app.delete('/added-rentals/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  
+  // Find the index of the rental with the given ID
+  const index = rentals.findIndex(rental => rental.id === id);
+  
+  // If the rental is found, remove it from the array
+  if (index !== -1) {
+      rentals.splice(index, 1);
+      res.sendStatus(204); // No content - successfully deleted
+  } else {
+      res.status(404).json({ error: 'Rental not found' });
+  }
+});
+
 // Ensure server is listening on the correct port
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);

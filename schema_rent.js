@@ -1,6 +1,12 @@
 const mongoose = require('mongoose');
 
 const rentSchema = new mongoose.Schema({
+    id: {
+        type: mongoose.Schema.Types.ObjectId,
+        index: true,
+        required: true,
+        auto: true
+    },
     propertyType: {
         type: String,
         required: true
@@ -24,7 +30,7 @@ const rentSchema = new mongoose.Schema({
     phoneNumber: {
         type: String,
         required: true
-      },
+    },
     areaOccupied: {
         type: Number,
         required: true
@@ -44,11 +50,12 @@ const rentSchema = new mongoose.Schema({
     parkingOption: {
         type: String,
         required: true
-    },user: {
+    },
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-      }
-});
+    }
+}, { timestamps: true });
 
 const Rental = mongoose.model('Rent', rentSchema);
 
