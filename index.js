@@ -170,6 +170,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
   try {
     const {
       propertyType,
+      phoneNumber,
       buildingType,
       location,
       landmark,
@@ -189,6 +190,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
     // Create a new rental object
     const newRental = new Rental({
       propertyType,
+      phoneNumber,
       buildingType,
       location,
       landmark,
