@@ -27,7 +27,7 @@ const rentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    phoneNumber: {
+    PhoneNumber: {
         type: String,
         required: true
     },
