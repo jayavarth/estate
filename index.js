@@ -290,7 +290,7 @@ app.post('/forgot', async (req, res) => {
 });
 
 // Example Express.js endpoint to get user details by username
-app.get('/user/:username', verifyToken, async (req, res) => {
+app.get('/api/profile/:username', verifyToken, async (req, res) => {
   const username = req.params.username;
   try {
       const user = await User.findOne({ username });
@@ -303,6 +303,7 @@ app.get('/user/:username', verifyToken, async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Delete rental endpoint
