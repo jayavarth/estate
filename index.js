@@ -289,6 +289,22 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
+// Example Express.js endpoint to get user details by username
+app.get('/user/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+      const user = await User.findOne({ username });
+      if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+      }
+      res.json(user);
+  } catch (error) {
+      console.error('Error fetching user details:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Delete rental endpoint
 app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
   const id = req.params.id;
