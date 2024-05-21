@@ -287,18 +287,20 @@ app.post('/forgot', async (req, res) => {
 
 app.delete('/rentals/:id', verifyToken, async (req, res) => {
   const id = req.params.id;
-  
+  console.log("Received request to delete rental with ID:", id); // Log rental ID
   try {
-    const deletedRental = await Rental.findByIdAndDelete(id);
-    if (!deletedRental) {
-      return res.status(404).json({ error: 'Rental not found' });
-    }
-    res.sendStatus(204); // No content - successfully deleted
+      const deletedRental = await Rental.findByIdAndDelete(id);
+      if (!deletedRental) {
+          console.log("Rental not found for ID:", id); // Log if rental not found
+          return res.status(404).json({ error: 'Rental not found' });
+      }
+      res.sendStatus(204); // No content - successfully deleted
   } catch (error) {
-    console.error('Error deleting rental:', error);
-    res.status(500).json({ error: 'Internal server error' });
+      console.error('Error deleting rental:', error);
+      res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
