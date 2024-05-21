@@ -24,6 +24,8 @@ app.use(express.json());
 app.use(cors());
 
 // Signup endpoint
+// Signup endpoint
+// Signup endpoint
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
 
@@ -39,12 +41,14 @@ app.post('/signup', async (req, res) => {
     // Generate token for the newly signed up user
     const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
 
-    res.status(201).json({ message: 'User created successfully', token });
+    res.status(201).json({ message: 'User created successfully', token, userType: newUser.userType }); // Include userType in response
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 
 // Login endpoint
 app.post('/login', async (req, res) => {
