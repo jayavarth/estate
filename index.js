@@ -247,7 +247,6 @@ app.get('/all-rentals', async (req, res) => {
 
 
 // Search listings endpoint
-// Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType, listingType } = req.query;
@@ -275,7 +274,6 @@ app.get('/search-listings', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 
