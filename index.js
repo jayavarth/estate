@@ -262,20 +262,22 @@ app.get('/search-listings', async (req, res) => {
       filter.propertyType = propertyType;
     }
 
-    if (listingType === "sale" || listingType === "rental") {
-      filter.saleType = listingType; // Filter for sale or rental listings
+    // Adjust the logic for filtering based on listingType
+    if (listingType === "sale") {
+      filter.saleType = "sale"; // Filter for sale listings
+    } else if (listingType === "rental") {
+      filter.saleType = "rental"; // Filter for rental listings
     }
 
     const listings = await Listing.find(filter);
-    // Separate sale and rental listings
-    const saleListings = listings.filter(listing => listing.saleType === "sale");
-    const rentalListings = listings.filter(listing => listing.saleType === "rental");
-    res.status(200).json({ saleListings, rentalListings });
+    // Return the filtered listings directly
+    res.status(200).json(listings);
   } catch (error) {
     console.error('Error fetching search results:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.post('/forgot', async (req, res) => {
