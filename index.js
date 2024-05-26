@@ -245,29 +245,33 @@ app.get('/all-rentals', async (req, res) => {
 });
 
 
-
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType, listingType } = req.query;
-    let filter = {};
+    let saleFilter = {};
+    let rentalFilter = {};
 
     if (bhk) {
-      filter.buildingType = bhk;
+      saleFilter.buildingType = rentalFilter.buildingType = bhk;
     }
     if (location) {
-      filter.location = { $regex: location, $options: 'i' };
+      saleFilter.location = rentalFilter.location = { $regex: location, $options: 'i' };
     }
     if (propertyType) {
-      filter.propertyType = propertyType;
+      saleFilter.propertyType = rentalFilter.propertyType = propertyType;
     }
 
-    if (listingType === "sale" || listingType === "rental") {
-      filter.saleType = listingType; // Filter for sale or rental listings
+    let saleListings = [];
+    let rentalListings = [];
+
+    if (listingType === "sale" || !listingType) {
+      saleListings = await Listing.find(saleFilter);
+    }
+    if (listingType === "rental" || !listingType) {
+      rentalListings = await Rental.find(rentalFilter);
     }
 
-    const listings = await Listing.find(filter);
-
-    res.status(200).json(listings);
+    res.status(200).json({ saleListings, rentalListings });
   } catch (error) {
     console.error('Error fetching search results:', error);
     res.status(500).json({ error: 'Internal server error' });
