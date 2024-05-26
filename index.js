@@ -299,6 +299,43 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
+app.post('/add-to-wishlist', verifyToken, async (req, res) => {
+  const { listingId, rentalId } = req.body;
+  const userId = req.userId;
+
+  try {
+    const wishlistItem = new Wishlist({
+      user: userId,
+      listing: listingId,
+      rental: rentalId
+    });
+
+    await wishlistItem.save();
+
+    res.status(201).json({ message: 'Added to wishlist successfully' });
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get wishlist endpoint
+app.get('/wishlist', verifyToken, async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    const wishlistItems = await Wishlist.find({ user: userId })
+      .populate('listing')
+      .populate('rental');
+      
+    res.status(200).json(wishlistItems);
+  } catch (error) {
+    console.error('Error fetching wishlist:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Example Express.js endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
   const username = req.params.username;
