@@ -322,21 +322,30 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   }
 });
 
-// Endpoint to Retrieve Wishlist
+// Retrieve Wishlist endpoint
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
   try {
+    // Find wishlist items for the current user and populate listing and rental details
     const wishlistItems = await Wishlist.find({ user: userId })
       .populate('listing') // Populate the listing details
       .populate('rental'); // Populate the rental details
       
+    // Check if wishlistItems is empty
+    if (wishlistItems.length === 0) {
+      return res.status(404).json({ message: 'Wishlist is empty' });
+    }
+
+    // If wishlistItems is not empty, send it in the response
     res.status(200).json(wishlistItems);
   } catch (error) {
+    // Handle errors
     console.error('Error fetching wishlist:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
