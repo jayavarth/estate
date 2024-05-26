@@ -249,7 +249,7 @@ app.get('/all-rentals', async (req, res) => {
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
-    const { bhk, location, propertyType } = req.query;
+    const { bhk, location, propertyType, listingType } = req.query;
     let filter = {};
 
     if (bhk) {
@@ -262,6 +262,12 @@ app.get('/search-listings', async (req, res) => {
       filter.propertyType = propertyType;
     }
 
+    if (listingType === "sale") {
+      filter.saleType = "sale"; // Filter for sale listings
+    } else if (listingType === "rental") {
+      filter.saleType = "rental"; // Filter for rental listings
+    }
+
     const listings = await Listing.find(filter);
     res.status(200).json(listings);
   } catch (error) {
@@ -269,6 +275,7 @@ app.get('/search-listings', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.post('/forgot', async (req, res) => {
   const { email, newPassword } = req.body;
