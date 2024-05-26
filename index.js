@@ -246,7 +246,6 @@ app.get('/all-rentals', async (req, res) => {
 
 
 
-// Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType, listingType } = req.query;
