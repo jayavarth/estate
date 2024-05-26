@@ -319,6 +319,7 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   }
 });
 
+
 // Get wishlist endpoint
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
