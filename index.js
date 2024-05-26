@@ -247,6 +247,7 @@ app.get('/all-rentals', async (req, res) => {
 
 
 // Search listings endpoint
+// Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType, listingType } = req.query;
@@ -262,21 +263,19 @@ app.get('/search-listings', async (req, res) => {
       filter.propertyType = propertyType;
     }
 
-    // Adjust the logic for filtering based on listingType
-    if (listingType === "sale") {
-      filter.saleType = "sale"; // Filter for sale listings
-    } else if (listingType === "rental") {
-      filter.saleType = "rental"; // Filter for rental listings
+    if (listingType === "sale" || listingType === "rental") {
+      filter.saleType = listingType; // Filter for sale or rental listings
     }
 
     const listings = await Listing.find(filter);
-    // Return the filtered listings directly
+
     res.status(200).json(listings);
   } catch (error) {
     console.error('Error fetching search results:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
