@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const { Rental } = require('./schema_rent');
+const { Wishlist } = require('./Schema_wishlist');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -299,6 +300,8 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
+
+// Endpoint to Add Items to Wishlist
 app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   const { listingId, rentalId } = req.body;
   const userId = req.userId;
@@ -319,8 +322,7 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   }
 });
 
-
-// Get wishlist endpoint
+// Endpoint to Retrieve Wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
