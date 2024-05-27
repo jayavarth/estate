@@ -55,25 +55,31 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    if (user.password !== password) {
-      return res.status(401).json({ error: 'Invalid password' });
-    }
-
-    const userType = user.userType;
-    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '4h' });
-
-    res.status(200).json({ message: 'Login successful', token, userType });
-  } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ error: 'Internal server error' });
+  // Find user by email
+  const user = await User.findOne({ email });
+  if (!user) {
+      return res.status(401).json({ error: 'User not found' });
   }
+
+  // Check password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+  }
+
+  // Generate token
+  const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+
+  res.json({
+      token,
+      user: {
+          userId: user._id,
+          username: user.username,
+          userType: user.userType
+      }
+  });
 });
+
 
 
 // Middleware to verify JWT token
@@ -337,8 +343,6 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 
 
 
