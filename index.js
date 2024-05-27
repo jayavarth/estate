@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs'); // Ensure bcrypt is imported
 
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
@@ -22,10 +23,13 @@ mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mo
 });
 
 app.use(express.json());
-app.use(cors());
 
-// Signup endpoint
-// Signup endpoint
+// Configure CORS
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow requests from this origin
+  optionsSuccessStatus: 200 // For legacy browser support
+}));
+
 // Signup endpoint
 app.post('/signup', async (req, res) => {
   const { username, email, password, userType } = req.body;
@@ -36,7 +40,8 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const newUser = new User({ username, email, password, userType });
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password before saving
+    const newUser = new User({ username, email, password: hashedPassword, userType });
     await newUser.save();
 
     // Generate token for the newly signed up user
@@ -49,42 +54,43 @@ app.post('/signup', async (req, res) => {
   }
 });
 
-
-
 // Login endpoint
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // Find user by email
-  const user = await User.findOne({ email });
-  if (!user) {
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
       return res.status(401).json({ error: 'User not found' });
-  }
+    }
 
-  // Check password
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
-  }
+    }
 
-  // Generate token
-  const token = jwt.sign({ userId: user._id }, 'your_jwt_secret', { expiresIn: '1h' });
+    // Generate token
+    const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
-  res.json({
+    res.json({
       token,
       user: {
-          userId: user._id,
-          username: user.username,
-          userType: user.userType
+        userId: user._id,
+        username: user.username,
+        userType: user.userType
       }
-  });
+    });
+  } catch (error) {
+    console.error('Error during login:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
-
-
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.query.token || req.headers.authorization.split(' ')[1];
+  const token = req.query.token || req.headers.authorization?.split(' ')[1];
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -97,9 +103,6 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
-
-
-
 
 // Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
@@ -121,10 +124,6 @@ app.post('/listings', verifyToken, async (req, res) => {
       cost
     } = req.body;
     const userId = req.userId;
-
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
 
     const newListing = new Listing({
       ownerType,
@@ -149,7 +148,7 @@ app.post('/listings', verifyToken, async (req, res) => {
     res.status(201).json({ message: 'Listing created successfully' });
   } catch (error) {
     console.error('Error creating listing:', error);
-    res.status(500).json(error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -194,11 +193,6 @@ app.post('/rentals', verifyToken, async (req, res) => {
     } = req.body;
     const userId = req.userId;
 
-    if (!userId) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    // Create a new rental object
     const newRental = new Rental({
       propertyType,
       PhoneNumber,
@@ -214,7 +208,6 @@ app.post('/rentals', verifyToken, async (req, res) => {
       user: userId
     });
 
-    // Save the new rental object to the database
     const savedRental = await newRental.save();
 
     res.status(201).json({ 
@@ -226,7 +219,6 @@ app.post('/rentals', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 // Retrieve user's rental properties endpoint
 app.get('/added-rentals', verifyToken, async (req, res) => {
@@ -251,7 +243,7 @@ app.get('/all-rentals', async (req, res) => {
   }
 });
 
-
+// Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
     const { bhk, location, propertyType, listingType } = req.query;
@@ -285,8 +277,7 @@ app.get('/search-listings', async (req, res) => {
   }
 });
 
-
-
+// Forgot password endpoint
 app.post('/forgot', async (req, res) => {
   const { email, newPassword } = req.body;
 
@@ -296,7 +287,7 @@ app.post('/forgot', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    user.password = newPassword;  // Update the user's password
+    user.password = await bcrypt.hash(newPassword, 10); // Hash the new password
     await user.save();
 
     res.status(200).json({ message: 'Password reset successfully' });
@@ -306,8 +297,7 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
-
-// Endpoint to Add Items to Wishlist
+// Endpoint to add items to wishlist
 app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   const { listingId, rentalId } = req.body;
   const userId = req.userId;
@@ -328,9 +318,9 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   }
 });
 
-// Endpoint to Retrieve Wishlist
+// Endpoint to retrieve wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
-  const userId = req.query.userId || req.userId; // Use query parameter if provided, otherwise use authenticated user's ID
+  const userId = req.userId;
 
   try {
     const wishlistItems = await Wishlist.find({ user: userId })
@@ -344,45 +334,37 @@ app.get('/wishlist', verifyToken, async (req, res) => {
   }
 });
 
-
-
-// Example Express.js endpoint to get user details by username
+// Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
   const username = req.params.username;
   try {
-      const user = await User.findOne({ username });
-      if (!user) {
-          return res.status(404).json({ error: 'User not found' });
-      }
-      res.json(user);
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
   } catch (error) {
-      console.error('Error fetching user details:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
 
 // Delete rental endpoint
 app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
   const id = req.params.id;
   console.log("Received request to delete rental with ID:", id); // Log rental ID
   try {
-      const deletedRental = await Rental.findByIdAndDelete(id);
-      if (!deletedRental) {
-          console.log("Rental not found for ID:", id); // Log if rental not found
-          return res.status(404).json({ error: 'Rental not found' });
-      }
-      res.sendStatus(204); // No content - successfully deleted
+    const deletedRental = await Rental.findByIdAndDelete(id);
+    if (!deletedRental) {
+      console.log("Rental not found for ID:", id); // Log if rental not found
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    res.sendStatus(204); // No content - successfully deleted
   } catch (error) {
-      console.error('Error deleting rental:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    console.error('Error deleting rental:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
-
-
-
-
 
 // Ensure server is listening on the correct port
 app.listen(port, () => {
