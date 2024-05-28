@@ -327,12 +327,15 @@ app.get('/wishlist', verifyToken, async (req, res) => {
       .populate('listing') // Populate the listing details
       .populate('rental'); // Populate the rental details
       
+    console.log('Fetched wishlist items:', wishlistItems); // Log fetched items
+
     res.status(200).json(wishlistItems);
   } catch (error) {
     console.error('Error fetching wishlist:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
