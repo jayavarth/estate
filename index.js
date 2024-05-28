@@ -90,7 +90,8 @@ app.post('/login', async (req, res) => {
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.query.token || req.headers.authorization?.split(' ')[1];
+  const token = req.headers.authorization?.split(' ')[1]; // Correctly extract token from headers
+
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -337,6 +338,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
 });
 
 
+
 // Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
   const username = req.params.username;
@@ -351,6 +353,7 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Delete rental endpoint
 app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
