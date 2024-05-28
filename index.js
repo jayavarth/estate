@@ -324,6 +324,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
   try {
+    console.log('Fetching wishlist for userId:', userId); // Log userId
     const wishlistItems = await Wishlist.find({ user: userId })
       .populate('listing') // Populate the listing details
       .populate('rental'); // Populate the rental details
@@ -336,6 +337,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
