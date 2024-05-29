@@ -105,6 +105,8 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+
+
 // Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
   try {
@@ -321,22 +323,16 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 
 // Endpoint to retrieve wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
-  const userId = req.userId;
-
+  const userId = req.query.userId;
   try {
-    console.log('Fetching wishlist for userId:', userId); // Log userId
-    const wishlistItems = await Wishlist.find({ user: userId })
-      .populate('listing') // Populate the listing details
-      .populate('rental'); // Populate the rental details
-      
-    console.log('Fetched wishlist items:', wishlistItems); // Log fetched items
-
-    res.status(200).json(wishlistItems);
+    const wishlistItems = await Wishlist.find({ userId: userId });
+    res.json(wishlistItems);
   } catch (error) {
-    console.error('Error fetching wishlist:', error);
+    console.error('Error fetching wishlist items:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
