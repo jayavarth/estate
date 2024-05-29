@@ -271,15 +271,16 @@ app.get('/all-rentals', async (req, res) => {
 });
 
 // Define a route to handle image uploads
-app.post('/upload-image', verifyToken, (req, res) => {
-  const { image } = req.body;
-  cloudinary.uploader.upload(image, (error, result) => {
-    if (error) {
-      return res.status(500).send(error);
-    }
-    res.json({ url: result.secure_url });
-  });
+app.post('/upload-image', verifyToken, upload.single('image'), (req, res) => {
+  // 'image' should match the name attribute of your file input field in the frontend form
+  // Multer middleware will process the file upload and store the image in Cloudinary storage
+
+  // If the file upload was successful, Multer adds a 'file' object to the request
+  const imageUrl = req.file.secure_url; // Retrieve the secure URL of the uploaded image from Cloudinary
+
+  res.json({ url: imageUrl }); // Send the image URL back to the client
 });
+
 
 
 // Search listings endpoint
