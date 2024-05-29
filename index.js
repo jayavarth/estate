@@ -4,6 +4,30 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Ensure bcrypt is imported
 
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Set up multer to use Cloudinary for storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'listings', // Folder in your Cloudinary account
+    allowedFormats: ['jpg', 'png']
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const { Rental } = require('./schema_rent');
@@ -245,6 +269,18 @@ app.get('/all-rentals', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Define a route to handle image uploads
+app.post('/upload-image', verifyToken, (req, res) => {
+  const { image } = req.body;
+  cloudinary.uploader.upload(image, (error, result) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.json({ url: result.secure_url });
+  });
+});
+
 
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
