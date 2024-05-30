@@ -2,11 +2,17 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs'); // Ensure bcrypt is imported
-
+const bcrypt = require('bcryptjs');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const { User } = require('./schema');
+const { Listing } = require('./schema_list');
+const { Rental } = require('./schema_rent');
+const { Wishlist } = require('./Schema_wishlist');
+
+const app = express();
+const port = process.env.PORT || 3000;
 
 // Configure Cloudinary
 cloudinary.config({
@@ -19,23 +25,15 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'listings', // Folder in your Cloudinary account
+    folder: 'listings',
     allowedFormats: ['jpg', 'png']
   }
 });
 
 const upload = multer({ storage: storage });
 
-const { User } = require('./schema');
-const { Listing } = require('./schema_list');
-const { Rental } = require('./schema_rent');
-const { Wishlist } = require('./Schema_wishlist');
-
-const app = express();
-const port = process.env.PORT || 3000;
-
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mongodb.net/estate_db?retryWrites=true&w=majority&appName=Cluster0', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -48,8 +46,8 @@ app.use(express.json());
 
 // Configure CORS
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from this origin
-  optionsSuccessStatus: 200 // For legacy browser support
+  origin: 'http://localhost:5173',
+  optionsSuccessStatus: 200
 }));
 
 // Signup endpoint
@@ -62,14 +60,13 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ username, email, password: hashedPassword, userType });
     await newUser.save();
 
-    // Generate token for the newly signed up user
     const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
 
-    res.status(201).json({ message: 'User created successfully', token, userType: newUser.userType }); // Include userType in response
+    res.status(201).json({ message: 'User created successfully', token, userType: newUser.userType });
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -81,19 +78,16 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
     }
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate token
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
     res.json({
@@ -112,7 +106,7 @@ app.post('/login', async (req, res) => {
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1]; // Correctly extract token from headers
+  const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -235,7 +229,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
 
     res.status(201).json({ 
       message: 'Rental property added successfully',
-      rentalId: savedRental._id // Include the rental ID in the response
+      rentalId: savedRental._id
     });
   } catch (error) {
     console.error('Error adding rental property:', error);
@@ -266,18 +260,15 @@ app.get('/all-rentals', async (req, res) => {
   }
 });
 
-// Define a route to handle image uploads
+// Image upload endpoint
 app.post('/upload-image', upload.array('image', 10), (req, res) => {
-  // Multer middleware will process the file uploads and store the images in Cloudinary storage
-
-  // Check if files were uploaded successfully
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files were uploaded' });
   }
 
-  const imageUrls = req.files.map(file => file.secure_url); // Retrieve the secure URLs of the uploaded images from Cloudinary
+  const imageUrls = req.files.map(file => file.path); // Retrieve the secure URLs of the uploaded images from Cloudinary
 
-  res.json({ urls: imageUrls }); // Send the image URLs back to the client
+  res.json({ urls: imageUrls });
 });
 
 // Search listings endpoint
@@ -315,27 +306,7 @@ app.get('/search-listings', async (req, res) => {
   }
 });
 
-// Create wishlist endpoint
-app.post('/wishlist', verifyToken, async (req, res) => {
-  try {
-    const { listingId } = req.body;
-    const userId = req.userId;
-
-    const newWishlist = new Wishlist({
-      listing: listingId,
-      user: userId
-    });
-
-    await newWishlist.save();
-
-    res.status(201).json({ message: 'Added to wishlist successfully' });
-  } catch (error) {
-    console.error('Error adding to wishlist:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
-
-// Retrieve user's wishlist endpoint
+//wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
   try {
     const userId = req.userId;
@@ -346,6 +317,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
