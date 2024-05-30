@@ -398,17 +398,26 @@ app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
 });
 
 //upload image
-app.post('/upload-image', (req, res) => {
-  const { image } = req.body;
-  cloudinary.uploader.upload(image, (error, result) => {
-    if (error) {
-      return res.status(500).send(error);
-    }
-    res.json({ url: result.secure_url });
-  });
+app.post('/upload-image', upload.array('image'), (req, res) => {
+  try {
+    // The uploaded files can be accessed via req.files
+    const imageUrls = req.files.map(file => file.path);
+    res.json({ urls: imageUrls });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Ensure server is listening on the correct port
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+
+
+
+
+
+
+
+
