@@ -29,7 +29,7 @@ const upload = multer({ storage: storage });
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const { Rental } = require('./schema_rent');
-const { Wishlist } = require('./schema_wishlist');
+const { Wishlist } = require('./Schema_wishlist');
 
 const app = express();
 const port = process.env.PORT || 3000;
