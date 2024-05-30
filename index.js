@@ -4,6 +4,45 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs'); // Ensure bcrypt is imported
 
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+
+
+app.post('/upload-image', (req, res) => {
+  const { image } = req.body;
+  cloudinary.uploader.upload(image, (error, result) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.json({ url: result.secure_url });
+  });
+});
+
+
+
+
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+// Set up multer to use Cloudinary for storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'listings', // Folder in your Cloudinary account
+    allowedFormats: ['jpg', 'png']
+  }
+});
+
+const upload = multer({ storage: storage });
+
+
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const { Rental } = require('./schema_rent');
@@ -246,6 +285,12 @@ app.get('/all-rentals', async (req, res) => {
   }
 });
 
+// Define a route to handle image uploads
+app.post('/upload', upload.single('image'), (req, res) => {
+  res.json({ url: req.file.path });
+});
+
+
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
@@ -323,22 +368,16 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 
 // Endpoint to retrieve wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
-  const userId = req.userId;
-
+  const userId = req.query.userId;
   try {
-    console.log('Fetching wishlist for userId:', userId); // Log userId
-    const wishlistItems = await Wishlist.find({ user: userId })
-      .populate('listing') // Populate the listing details
-      .populate('rental'); // Populate the rental details
-      
-    console.log('Fetched wishlist items:', wishlistItems); // Log fetched items
-
-    res.status(200).json(wishlistItems);
+    const wishlistItems = await Wishlist.find({ userId: userId });
+    res.json(wishlistItems);
   } catch (error) {
-    console.error('Error fetching wishlist:', error);
+    console.error('Error fetching wishlist items:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 
