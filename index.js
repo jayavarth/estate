@@ -274,7 +274,7 @@ app.get('/all-rentals', async (req, res) => {
 
 
 // Define a route to handle image uploads
-app.post('/upload-image', verifyToken, upload.array('image', 10), (req, res) => {
+app.post('/upload-image', upload.array('image', 10), (req, res) => {
   // Multer middleware will process the file uploads and store the images in Cloudinary storage
 
   // Check if files were uploaded successfully
