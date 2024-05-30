@@ -144,6 +144,8 @@ app.post('/listings', verifyToken, async (req, res) => {
     } = req.body;
     const userId = req.userId;
 
+    console.log("Received listing details:", req.body);
+
     const newListing = new Listing({
       ownerType,
       propertyType,
@@ -170,6 +172,7 @@ app.post('/listings', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Retrieve user's listings endpoint
 app.get('/added-listings', verifyToken, async (req, res) => {
