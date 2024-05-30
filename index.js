@@ -9,21 +9,6 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
 
-
-app.post('/upload-image', (req, res) => {
-  const { image } = req.body;
-  cloudinary.uploader.upload(image, (error, result) => {
-    if (error) {
-      return res.status(500).send(error);
-    }
-    res.json({ url: result.secure_url });
-  });
-});
-
-
-
-
-
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -379,9 +364,6 @@ app.get('/wishlist', verifyToken, async (req, res) => {
 });
 
 
-
-
-
 // Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
   const username = req.params.username;
@@ -413,6 +395,17 @@ app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
     console.error('Error deleting rental:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+//upload image
+app.post('/upload-image', (req, res) => {
+  const { image } = req.body;
+  cloudinary.uploader.upload(image, (error, result) => {
+    if (error) {
+      return res.status(500).send(error);
+    }
+    res.json({ url: result.secure_url });
+  });
 });
 
 // Ensure server is listening on the correct port
