@@ -78,16 +78,19 @@ app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
     }
 
+    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Generate token
     const token = jwt.sign({ userId: user._id }, 'secret', { expiresIn: '1h' });
 
     res.json({
@@ -103,6 +106,7 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
