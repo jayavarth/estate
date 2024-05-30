@@ -2,10 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const cloudinary = require('cloudinary').v2;
-const multer = require('multer');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const bcrypt = require('bcryptjs'); // Ensure bcrypt is imported
+
 const { User } = require('./schema');
 const { Listing } = require('./schema_list');
 const { Rental } = require('./schema_rent');
@@ -14,26 +12,8 @@ const { Wishlist } = require('./Schema_wishlist');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
-
-// Set up multer to use Cloudinary for storage
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'listings',
-    allowedFormats: ['jpg', 'png']
-  }
-});
-
-const upload = multer({ storage: storage });
-
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect('mongodb+srv://jayavardhinim14:Jayvardh2004@cluster0.yxnqgbb.mongodb.net/estate_db?retryWrites=true&w=majority&appName=Cluster0', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -46,8 +26,8 @@ app.use(express.json());
 
 // Configure CORS
 app.use(cors({
-  origin: 'http://localhost:5173',
-  optionsSuccessStatus: 200
+  origin: 'http://localhost:5173', // Allow requests from this origin
+  optionsSuccessStatus: 200 // For legacy browser support
 }));
 
 // Signup endpoint
@@ -60,13 +40,14 @@ app.post('/signup', async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10); // Hash the password before saving
     const newUser = new User({ username, email, password: hashedPassword, userType });
     await newUser.save();
 
+    // Generate token for the newly signed up user
     const token = jwt.sign({ userId: newUser._id }, 'secret', { expiresIn: '2h' });
 
-    res.status(201).json({ message: 'User created successfully', token, userType: newUser.userType });
+    res.status(201).json({ message: 'User created successfully', token, userType: newUser.userType }); // Include userType in response
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -107,10 +88,9 @@ app.post('/login', async (req, res) => {
   }
 });
 
-
 // Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.headers.authorization?.split(' ')[1]; // Correctly extract token from headers
 
   if (!token) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -124,6 +104,8 @@ const verifyToken = (req, res, next) => {
     next();
   });
 };
+
+
 
 // Create listing endpoint
 app.post('/listings', verifyToken, async (req, res) => {
@@ -233,7 +215,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
 
     res.status(201).json({ 
       message: 'Rental property added successfully',
-      rentalId: savedRental._id
+      rentalId: savedRental._id // Include the rental ID in the response
     });
   } catch (error) {
     console.error('Error adding rental property:', error);
@@ -264,17 +246,6 @@ app.get('/all-rentals', async (req, res) => {
   }
 });
 
-// Image upload endpoint
-app.post('/upload-image', upload.array('image', 10), (req, res) => {
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: 'No files were uploaded' });
-  }
-
-  const imageUrls = req.files.map(file => file.path); // Retrieve the secure URLs of the uploaded images from Cloudinary
-
-  res.json({ urls: imageUrls });
-});
-
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
@@ -292,30 +263,77 @@ app.get('/search-listings', async (req, res) => {
       saleFilter.propertyType = rentalFilter.propertyType = propertyType;
     }
 
-    let listings = [];
-    if (listingType === 'sale') {
-      listings = await Listing.find(saleFilter);
-    } else if (listingType === 'rent') {
-      listings = await Rental.find(rentalFilter);
-    } else {
-      const sales = await Listing.find(saleFilter);
-      const rentals = await Rental.find(rentalFilter);
-      listings = [...sales, ...rentals];
+    let saleListings = [];
+    let rentalListings = [];
+
+    if (listingType === "sale" || !listingType) {
+      saleListings = await Listing.find(saleFilter);
+    }
+    if (listingType === "rental" || !listingType) {
+      rentalListings = await Rental.find(rentalFilter);
     }
 
-    res.status(200).json(listings);
+    res.status(200).json({ saleListings, rentalListings });
   } catch (error) {
-    console.error('Error searching listings:', error);
+    console.error('Error fetching search results:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-//wishlist
-app.get('/wishlist', verifyToken, async (req, res) => {
+// Forgot password endpoint
+app.post('/forgot', async (req, res) => {
+  const { email, newPassword } = req.body;
+
   try {
-    const userId = req.userId;
-    const wishlist = await Wishlist.find({ user: userId }).populate('listing');
-    res.status(200).json(wishlist);
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10); // Hash the new password
+    await user.save();
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to add items to wishlist
+app.post('/add-to-wishlist', verifyToken, async (req, res) => {
+  const { listingId, rentalId } = req.body;
+  const userId = req.userId;
+
+  try {
+    const wishlistItem = new Wishlist({
+      user: userId,
+      listing: listingId,
+      rental: rentalId
+    });
+
+    await wishlistItem.save();
+
+    res.status(201).json({ message: 'Added to wishlist successfully' });
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to retrieve wishlist
+app.get('/wishlist', verifyToken, async (req, res) => {
+  const userId = req.userId;
+
+  try {
+    console.log('Fetching wishlist for userId:', userId); // Log userId
+    const wishlistItems = await Wishlist.find({ user: userId })
+      .populate('listing') // Populate the listing details
+      .populate('rental'); // Populate the rental details
+      
+    console.log('Fetched wishlist items:', wishlistItems); // Log fetched items
+
+    res.status(200).json(wishlistItems);
   } catch (error) {
     console.error('Error fetching wishlist:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -323,6 +341,42 @@ app.get('/wishlist', verifyToken, async (req, res) => {
 });
 
 
+
+
+// Endpoint to get user details by username
+app.get('/api/profile/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+// Delete rental endpoint
+app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
+  const id = req.params.id;
+  console.log("Received request to delete rental with ID:", id); // Log rental ID
+  try {
+    const deletedRental = await Rental.findByIdAndDelete(id);
+    if (!deletedRental) {
+      console.log("Rental not found for ID:", id); // Log if rental not found
+      return res.status(404).json({ error: 'Rental not found' });
+    }
+    res.sendStatus(204); // No content - successfully deleted
+  } catch (error) {
+    console.error('Error deleting rental:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Ensure server is listening on the correct port
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+  console.log(`Server running on http://localhost:${port}`);
 });
