@@ -378,6 +378,44 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
   }
 });
 
+// Route to get user profile
+app.get('/api/profile/:username', verifyToken, async (req, res) => {
+  const { username } = req.params;
+  try {
+    const user = await User.findOne({ username });
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Route to update social media profiles
+app.post('/api/profile/:username/social-media', verifyToken, async (req, res) => {
+  const { username } = req.params;
+  const { facebook, twitter, linkedin, instagram } = req.body;
+  try {
+    const user = await User.findOneAndUpdate(
+      { username },
+      { facebook, twitter, linkedin, instagram },
+      { new: true }
+    );
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error updating social media profiles:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 // Delete rental endpoint
 app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
   const id = req.params.id;
