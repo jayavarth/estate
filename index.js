@@ -428,23 +428,31 @@ app.post('/api/profile/:username/social-media', verifyToken, async (req, res) =>
 
 app.delete('/remove_listing/:id', async (req, res) => {
   try {
-      const { id } = req.params;
-      const removedListing = await Listing.findByIdAndRemove(id);
-      if (removedListing) {
-          res.json({ message: 'Listing removed successfully' });
-      } else {
-          res.status(404).json({ error: 'Listing not found' });
-      }
+    const { id } = req.params;
+    
+    // Check if the ID is valid
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ error: 'Invalid listing ID' });
+    }
+    
+    // Find and remove the listing
+    const removedListing = await Listing.findByIdAndRemove(id);
+    
+    // Check if the listing was found and removed
+    if (removedListing) {
+      res.json({ message: 'Listing removed successfully' });
+    } else {
+      res.status(404).json({ error: 'Listing not found' });
+    }
   } catch (error) {
-      console.error("Error removing listing:", error);
-      res.status(500).json({ error: 'Failed to remove listing' });
+    console.error("Error removing listing:", error);
+    res.status(500).json({ error: 'Failed to remove listing' });
   }
 });
 
 
-
 // Delete rental endpoint
-app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
+app.delete('/remove_rentals/:id', async (req, res) => {
   const id = req.params.id;
   console.log("Received request to delete rental with ID:", id);
   try {
