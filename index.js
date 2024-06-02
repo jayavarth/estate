@@ -426,6 +426,22 @@ app.post('/api/profile/:username/social-media', verifyToken, async (req, res) =>
   }
 });
 
+app.delete('/remove_listing/:id', async (req, res) => {
+  try {
+      const { id } = req.params;
+      const removedListing = await Listing.findByIdAndRemove(id);
+      if (removedListing) {
+          res.json({ message: 'Listing removed successfully' });
+      } else {
+          res.status(404).json({ error: 'Listing not found' });
+      }
+  } catch (error) {
+      console.error("Error removing listing:", error);
+      res.status(500).json({ error: 'Failed to remove listing' });
+  }
+});
+
+
 
 // Delete rental endpoint
 app.delete('/remove_rentals/:id', verifyToken, async (req, res) => {
