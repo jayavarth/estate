@@ -426,7 +426,7 @@ app.post('/api/profile/:username/social-media', verifyToken, async (req, res) =>
   }
 });
 
-app.delete('/remove_listing/:id', async (req, res) => {
+app.delete('/remove_listing/:id',verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
     
@@ -452,7 +452,7 @@ app.delete('/remove_listing/:id', async (req, res) => {
 
 
 // Delete rental endpoint
-app.delete('/remove_rentals/:id', async (req, res) => {
+app.delete('/remove_rentals/:id',verifyToken, async (req, res) => {
   const id = req.params.id;
   console.log("Received request to delete rental with ID:", id);
   try {
