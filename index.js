@@ -52,8 +52,19 @@ app.use(cors({
   optionsSuccessStatus: 200,
 }));
 
+const validateEmail = (req, res, next) => {
+  const { email } = req.body;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com)$/;
+
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  next();
+};
+
 // Signup endpoint
-app.post('/signup', async (req, res) => {
+app.post('/signup',validateEmail, async (req, res) => {
   const { username, email, password, userType } = req.body;
 
   try {
@@ -76,7 +87,7 @@ app.post('/signup', async (req, res) => {
 });
 
 // Login endpoint
-app.post('/login', async (req, res) => {
+app.post('/login',validateEmail, async (req, res) => {
   const { email, password } = req.body;
 
   try {
