@@ -426,9 +426,10 @@ app.post('/api/profile/:username/social-media', verifyToken, async (req, res) =>
   }
 });
 
-app.delete('/remove_listing/:id',verifyToken, async (req, res) => {
+app.delete('/remove_listing/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("Received request to delete listing with ID:", id);
     
     // Check if the ID is valid
     if (!mongoose.isValidObjectId(id)) {
