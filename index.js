@@ -426,6 +426,9 @@ app.post('/api/profile/:username/social-media', verifyToken, async (req, res) =>
   }
 });
 
+
+
+// Delete rental endpoint
 app.delete('/remove_listing/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -437,7 +440,7 @@ app.delete('/remove_listing/:id', async (req, res) => {
     }
     
     // Find and remove the listing
-    const removedListing = await Listing.findByIdAndRemove(id);
+    const removedListing = await Listing.findByIdAndDelete(id);
     
     // Check if the listing was found and removed
     if (removedListing) {
@@ -451,23 +454,6 @@ app.delete('/remove_listing/:id', async (req, res) => {
   }
 });
 
-
-// Delete rental endpoint
-app.delete('/remove_rentals/:id',verifyToken, async (req, res) => {
-  const id = req.params.id;
-  console.log("Received request to delete rental with ID:", id);
-  try {
-    const deletedRental = await Rental.findByIdAndDelete(id);
-    if (!deletedRental) {
-      console.log("Rental not found for ID:", id);
-      return res.status(404).json({ error: 'Rental not found' });
-    }
-    res.sendStatus(204);
-  } catch (error) {
-    console.error('Error deleting rental:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
