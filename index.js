@@ -77,7 +77,7 @@ const validateEmail = (req, res, next) => {
 };
 
 // Signup endpoint
-app.post('/signup',validateEmail, async (req, res) => {
+app.post('/signup', validateEmail, async (req, res) => {
   const { username, email, password, userType } = req.body;
 
   try {
@@ -100,7 +100,7 @@ app.post('/signup',validateEmail, async (req, res) => {
 });
 
 // Login endpoint
-app.post('/login',validateEmail, async (req, res) => {
+app.post('/login', validateEmail, async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -399,6 +399,33 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
     res.json(user);
   } catch (error) {
     console.error('Error fetching user details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to get recent activity by username
+app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+    const activities = await Activity.find({ username });
+    res.json(activities);
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to get user stats by username
+app.get('/api/stats/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+    const stats = await Stats.findOne({ username });
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching stats:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
