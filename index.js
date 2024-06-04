@@ -433,71 +433,54 @@ app.delete('/remove_listing/:id', async (req, res) => {
 });
 
 
-// Authentication Middleware
-const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) return res.sendStatus(401);
-
-    jwt.verify(token, 'your_jwt_secret_key', (err, user) => {
-        if (err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-};
-
-
-app.get('/api/recent-activity/:username', authenticateToken, async (req, res) => {
-    try {
-        const activities = await Activity.find({ username: req.params.username }).sort({ date: -1 }).limit(10);
-        res.json(activities);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
+  try {
+      const activities = await Activity.find({ username: req.params.username }).sort({ date: -1 }).limit(10);
+      res.json(activities);
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-app.get('/api/stats/:username', authenticateToken, async (req, res) => {
-    try {
-        const stats = await Stats.findOne({ username: req.params.username });
-        if (!stats) {
-            return res.status(404).json({ error: 'Stats not found' });
-        }
-        res.json(stats);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.get('/api/stats/:username', verifyToken, async (req, res) => {
+  try {
+      const stats = await Stats.findOne({ username: req.params.username });
+      if (!stats) {
+          return res.status(404).json({ error: 'Stats not found' });
+      }
+      res.json(stats);
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Example endpoint to add activity (for testing purposes)
-app.post('/api/add-activity', authenticateToken, async (req, res) => {
-    try {
-        const activity = new Activity({
-            username: req.body.username,
-            description: req.body.description,
-            date: new Date(),
-        });
-        await activity.save();
-        res.status(201).json(activity);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.post('/api/add-activity', verifyToken, async (req, res) => {
+  try {
+      const activity = new Activity({
+          username: req.body.username,
+          description: req.body.description,
+          date: new Date(),
+      });
+      await activity.save();
+      res.status(201).json(activity);
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
-// Example endpoint to add stats (for testing purposes)
-app.post('/api/add-stats', authenticateToken, async (req, res) => {
-    try {
-        const stats = new Stats({
-            username: req.body.username,
-            totalProperties: req.body.totalProperties,
-            propertiesSoldOrRented: req.body.propertiesSoldOrRented,
-            activeListings: req.body.activeListings,
-        });
-        await stats.save();
-        res.status(201).json(stats);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
+app.post('/api/add-stats', verifyToken, async (req, res) => {
+  try {
+      const stats = new Stats({
+          username: req.body.username,
+          totalProperties: req.body.totalProperties,
+          propertiesSoldOrRented: req.body.propertiesSoldOrRented,
+          activeListings: req.body.activeListings,
+      });
+      await stats.save();
+      res.status(201).json(stats);
+  } catch (error) {
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 
