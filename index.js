@@ -197,7 +197,6 @@ app.post('/listings', verifyToken, async (req, res) => {
   }
 });
 
-
 // Retrieve user's listings endpoint
 app.get('/added-listings', verifyToken, async (req, res) => {
   try {
@@ -404,22 +403,20 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
   }
 });
 
-
-
 // Delete rental endpoint
 app.delete('/remove_listing/:id', async (req, res) => {
   try {
     const { id } = req.params;
     console.log("Received request to delete listing with ID:", id);
-    
+
     // Check if the ID is valid
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ error: 'Invalid listing ID' });
     }
-    
+
     // Find and remove the listing
     const removedListing = await Listing.findByIdAndDelete(id);
-    
+
     // Check if the listing was found and removed
     if (removedListing) {
       res.json({ message: 'Listing removed successfully' });
@@ -432,57 +429,36 @@ app.delete('/remove_listing/:id', async (req, res) => {
   }
 });
 
-
-app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
-  try {
-      const activities = await Activity.find({ username: req.params.username }).sort({ date: -1 }).limit(10);
-      res.json(activities);
-  } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-app.get('/api/stats/:username', verifyToken, async (req, res) => {
-  try {
-      const stats = await Stats.findOne({ username: req.params.username });
-      if (!stats) {
-          return res.status(404).json({ error: 'Stats not found' });
-      }
-      res.json(stats);
-  } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
+// Example endpoint to add activity (for testing purposes)
 app.post('/api/add-activity', verifyToken, async (req, res) => {
   try {
-      const activity = new Activity({
-          username: req.body.username,
-          description: req.body.description,
-          date: new Date(),
-      });
-      await activity.save();
-      res.status(201).json(activity);
+    const activity = new Activity({
+      username: req.body.username,
+      description: req.body.description,
+      date: new Date(),
+    });
+    await activity.save();
+    res.status(201).json(activity);
   } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
+// Example endpoint to add stats (for testing purposes)
 app.post('/api/add-stats', verifyToken, async (req, res) => {
   try {
-      const stats = new Stats({
-          username: req.body.username,
-          totalProperties: req.body.totalProperties,
-          propertiesSoldOrRented: req.body.propertiesSoldOrRented,
-          activeListings: req.body.activeListings,
-      });
-      await stats.save();
-      res.status(201).json(stats);
+    const stats = new Stats({
+      username: req.body.username,
+      totalProperties: req.body.totalProperties,
+      propertiesSoldOrRented: req.body.propertiesSoldOrRented,
+      activeListings: req.body.activeListings,
+    });
+    await stats.save();
+    res.status(201).json(stats);
   } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
