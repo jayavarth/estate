@@ -16,14 +16,6 @@ const { Wishlist } = require('./Schema_wishlist');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Models
-const User = mongoose.model('User', new mongoose.Schema({
-  username: String,
-  email: String,
-  userType: String,
-  // Add other necessary fields
-}));
-
 const Activity = mongoose.model('Activity', new mongoose.Schema({
   username: String,
   description: String,
@@ -412,21 +404,6 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
   }
 });
 
-// Route to get user profile
-app.get('/api/profile/:username', verifyToken, async (req, res) => {
-  const { username } = req.params;
-  try {
-    const user = await User.findOne({ username });
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
 
 
 // Delete rental endpoint
@@ -470,18 +447,6 @@ const authenticateToken = (req, res, next) => {
     });
 };
 
-// Routes
-app.get('/api/profile/:username', authenticateToken, async (req, res) => {
-    try {
-        const user = await User.findOne({ username: req.params.username });
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-});
 
 app.get('/api/recent-activity/:username', authenticateToken, async (req, res) => {
     try {
