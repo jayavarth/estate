@@ -472,20 +472,29 @@ app.post('/api/add-activity', verifyToken, async (req, res) => {
 });
 
 // Example endpoint to add stats (for testing purposes)
-app.post('/api/add-stats', verifyToken, async (req, res) => {
+app.get('/api/stats/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
   try {
-    const stats = new Stats({
-      username: req.body.username,
-      totalProperties: req.body.totalProperties,
-      propertiesSoldOrRented: req.body.propertiesSoldOrRented,
-      activeListings: req.body.activeListings,
-    });
-    await stats.save();
-    res.status(201).json(stats);
+    let stats = await Stats.findOne({ username });
+
+    // If stats do not exist, create default stats
+    if (!stats) {
+      stats = new Stats({
+        username,
+        totalProperties: 0,
+        propertiesSoldOrRented: 0,
+        activeListings: 0,
+      });
+      await stats.save();
+    }
+
+    res.json(stats);
   } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
