@@ -379,14 +379,27 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 // Endpoint to retrieve wishlist
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.query.userId;
+  console.log(`Fetching wishlist for user ID: ${userId}`); // Log the user ID for debugging
+
   try {
-    const wishlistItems = await Wishlist.find({ user: userId });
+    const wishlistItems = await Wishlist.find({ user: userId })
+      .populate('listing')
+      .populate('rental');
+
+    if (!wishlistItems || wishlistItems.length === 0) {
+      console.log('No wishlist items found.');
+      return res.status(404).json({ error: 'Wishlist not found' });
+    }
+
+    console.log('Wishlist items found:', wishlistItems);
     res.json(wishlistItems);
   } catch (error) {
-    console.error('Error fetching wishlist items:', error);
+    console.error('Error fetching wishlist items:', error); // Log the error with detailed message
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
 
 // Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
