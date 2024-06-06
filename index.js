@@ -403,6 +403,32 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
   }
 });
 
+// Endpoint to get recent activity by username
+app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+    const activities = await Activity.find({ username });
+    res.json(activities);
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Endpoint to get user stats by username
+app.get('/api/stats/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
+  try {
+    const stats = await Stats.findOne({ username });
+    if (!stats) {
+      return res.status(404).json({ error: 'Stats not found' });
+    }
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Delete rental endpoint
 app.delete('/remove_listing/:id', async (req, res) => {
@@ -430,41 +456,38 @@ app.delete('/remove_listing/:id', async (req, res) => {
   }
 });
 
-// Endpoint to get user details by ID
-app.get('/api/profile/:id', verifyToken, async (req, res) => {
-  const userId = req.params.id;
+// Example endpoint to add activity (for testing purposes)
+app.post('/api/add-activity', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json(user);
+    const activity = new Activity({
+      username: req.body.username,
+      description: req.body.description,
+      date: new Date(),
+    });
+    await activity.save();
+    res.status(201).json(activity);
   } catch (error) {
-    console.error('Error fetching user details:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
-// Endpoint to get recent activity by user ID
-app.get('/api/recent-activity/:id', verifyToken, async (req, res) => {
-  const userId = req.params.id;
+// Example endpoint to add stats (for testing purposes)
+app.get('/api/stats/:username', verifyToken, async (req, res) => {
+  const username = req.params.username;
   try {
-    const activities = await Activity.find({ userId });
-    res.json(activities);
-  } catch (error) {
-    console.error('Error fetching recent activity:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+    let stats = await Stats.findOne({ username });
 
-// Endpoint to get user stats by ID
-app.get('/api/stats/:id', verifyToken, async (req, res) => {
-  const userId = req.params.id;
-  try {
-    const stats = await Stats.findOne({ userId });
+    // If stats do not exist, create default stats
     if (!stats) {
-      return res.status(404).json({ error: 'Stats not found' });
+      stats = new Stats({
+        username,
+        totalProperties: 0,
+        propertiesSoldOrRented: 0,
+        activeListings: 0,
+      });
+      await stats.save();
     }
+
     res.json(stats);
   } catch (error) {
     console.error('Error fetching stats:', error);
