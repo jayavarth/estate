@@ -356,32 +356,24 @@ app.post('/forgot', async (req, res) => {
 });
 
 app.post('/add-to-wishlist', verifyToken, async (req, res) => {
-  const { listingId, rentalId } = req.body;
+  const { listing, rental } = req.body;
   const userId = req.userId;
 
   try {
     let wishlistItem;
 
-    if (listingId) {
-      const listing = await Listing.findById(listingId);
-      if (!listing) {
-        return res.status(404).json({ error: 'Listing not found' });
-      }
+    if (listing) {
       wishlistItem = new Wishlist({
         user: userId,
-        listing: listing.toObject(),
+        listing,
       });
-    } else if (rentalId) {
-      const rental = await Rental.findById(rentalId);
-      if (!rental) {
-        return res.status(404).json({ error: 'Rental not found' });
-      }
+    } else if (rental) {
       wishlistItem = new Wishlist({
         user: userId,
-        rental: rental.toObject(),
+        rental,
       });
     } else {
-      throw new Error('Either listingId or rentalId must be provided');
+      throw new Error('Either listing or rental must be provided');
     }
 
     await wishlistItem.save();
@@ -391,6 +383,7 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
