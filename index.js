@@ -392,16 +392,9 @@ app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
   try {
-    // Find wishlist items for the user and populate the 'listing' or 'rental' fields
     const wishlistItems = await Wishlist.find({ user: userId })
-      .populate({
-        path: 'listing',
-        model: 'Listing'
-      })
-      .populate({
-        path: 'rental',
-        model: 'Rental'
-      });
+      .populate('listing', 'propertyType location cost') // Only populate required fields
+      .populate('rental', 'propertyType location monthlyRent'); // Only populate required fields
 
     res.status(200).json(wishlistItems);
   } catch (error) {
@@ -409,7 +402,6 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 
 // Endpoint to get user details by username
