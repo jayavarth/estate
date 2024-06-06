@@ -377,32 +377,35 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 });
 
 // Endpoint to retrieve wishlist
-app.get('/wishlist', async (req, res) => {
-  const userId = req.userId; // Assuming you have stored the decoded user ID in the request object
-
-  console.log(`Fetching wishlist for user ID: ${userId}`); // Log the user ID for debugging
+app.post('/add-to-wishlist', verifyToken, async (req, res) => {
+  const { listingId, rentalId } = req.body;
+  const userId = req.userId;
 
   try {
-    // Query the wishlist items associated with the user ID
-    const wishlistItems = await Wishlist.find({ user: userId })
-      .populate('listing')
-      .populate('rental');
-
-    // Handle case where no wishlist items are found
-    if (!wishlistItems || wishlistItems.length === 0) {
-      console.log('No wishlist items found.');
-      return res.status(404).json({ error: 'Wishlist not found' });
+    let wishlistItem;
+    if (listingId) {
+      wishlistItem = new Wishlist({
+        user: userId,
+        listing: listingId,
+      });
+    } else if (rentalId) {
+      wishlistItem = new Wishlist({
+        user: userId,
+        rental: rentalId,
+      });
+    } else {
+      throw new Error('Either listingId or rentalId must be provided');
     }
 
-    // Respond with the wishlist items
-    console.log('Wishlist items found:', wishlistItems);
-    res.json(wishlistItems);
+    await wishlistItem.save();
+
+    res.status(201).json({ message: 'Added to wishlist successfully' });
   } catch (error) {
-    // Handle errors
-    console.error('Error fetching wishlist items:', error);
+    console.error('Error adding to wishlist:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
   
 
 
