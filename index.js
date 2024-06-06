@@ -387,14 +387,21 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 
 
 
+// In the /wishlist endpoint
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
   try {
-    // Find wishlist items for the user
+    // Find wishlist items for the user and populate the 'listing' or 'rental' fields
     const wishlistItems = await Wishlist.find({ user: userId })
-      .populate('listing') // Populate the 'listing' field if it exists
-      .populate('rental'); // Populate the 'rental' field if it exists
+      .populate({
+        path: 'listing',
+        model: 'Listing'
+      })
+      .populate({
+        path: 'rental',
+        model: 'Rental'
+      });
 
     res.status(200).json(wishlistItems);
   } catch (error) {
@@ -402,6 +409,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Endpoint to get user details by username
