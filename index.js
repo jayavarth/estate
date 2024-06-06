@@ -355,29 +355,36 @@ app.post('/forgot', async (req, res) => {
   }
 });
 
-// Endpoint to add items to wishlist
 app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   const { listingId, rentalId } = req.body;
   const userId = req.userId;
 
   try {
     let wishlistItem;
+
     if (listingId) {
-      wishlistItem = await Wishlist.findOneAndUpdate(
-        { user: userId, listing: listingId },
-        { user: userId, listing: listingId },
-        { upsert: true, new: true }
-      );
+      const listing = await Listing.findById(listingId);
+      if (!listing) {
+        return res.status(404).json({ error: 'Listing not found' });
+      }
+      wishlistItem = new Wishlist({
+        user: userId,
+        listing: listing.toObject(),
+      });
     } else if (rentalId) {
-      wishlistItem = await Wishlist.findOneAndUpdate(
-        { user: userId, rental: rentalId },
-        { user: userId, rental: rentalId },
-        { upsert: true, new: true }
-      );
+      const rental = await Rental.findById(rentalId);
+      if (!rental) {
+        return res.status(404).json({ error: 'Rental not found' });
+      }
+      wishlistItem = new Wishlist({
+        user: userId,
+        rental: rental.toObject(),
+      });
     } else {
       throw new Error('Either listingId or rentalId must be provided');
     }
 
+    await wishlistItem.save();
     res.status(201).json({ message: 'Added to wishlist successfully', wishlistItem });
   } catch (error) {
     console.error('Error adding to wishlist:', error);
@@ -385,16 +392,11 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   }
 });
 
-
-
-// In the /wishlist endpoint
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.userId;
 
   try {
-    const wishlistItems = await Wishlist.find({ user: userId })
-      .populate('listing', 'propertyType location cost') // Only populate required fields
-      .populate('rental', 'propertyType location monthlyRent'); // Only populate required fields
+    const wishlistItems = await Wishlist.find({ user: userId });
 
     res.status(200).json(wishlistItems);
   } catch (error) {
@@ -402,6 +404,7 @@ app.get('/wishlist', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 // Endpoint to get user details by username
