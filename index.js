@@ -16,18 +16,18 @@ const { Wishlist } = require('./Schema_wishlist');
 const app = express();
 const port = process.env.PORT || 3000;
 
-const Activity = mongoose.model('Activity', new mongoose.Schema({
-  username: String,
-  description: String,
-  date: Date,
-}));
+// const Activity = mongoose.model('Activity', new mongoose.Schema({
+//   username: String,
+//   description: String,
+//   date: Date,
+// }));
 
-const Stats = mongoose.model('Stats', new mongoose.Schema({
-  username: String,
-  totalProperties: Number,
-  propertiesSoldOrRented: Number,
-  activeListings: Number,
-}));
+// const Stats = mongoose.model('Stats', new mongoose.Schema({
+//   username: String,
+//   totalProperties: Number,
+//   propertiesSoldOrRented: Number,
+//   activeListings: Number,
+// }));
 
 // Configure Cloudinary
 cloudinary.config({
@@ -403,32 +403,32 @@ app.get('/api/profile/:username', verifyToken, async (req, res) => {
   }
 });
 
-// Endpoint to get recent activity by username
-app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
-  const username = req.params.username;
-  try {
-    const activities = await Activity.find({ username });
-    res.json(activities);
-  } catch (error) {
-    console.error('Error fetching recent activity:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// // Endpoint to get recent activity by username
+// app.get('/api/recent-activity/:username', verifyToken, async (req, res) => {
+//   const username = req.params.username;
+//   try {
+//     const activities = await Activity.find({ username });
+//     res.json(activities);
+//   } catch (error) {
+//     console.error('Error fetching recent activity:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
-// Endpoint to get user stats by username
-app.get('/api/stats/:username', verifyToken, async (req, res) => {
-  const username = req.params.username;
-  try {
-    const stats = await Stats.findOne({ username });
-    if (!stats) {
-      return res.status(404).json({ error: 'Stats not found' });
-    }
-    res.json(stats);
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+// // Endpoint to get user stats by username
+// app.get('/api/stats/:username', verifyToken, async (req, res) => {
+//   const username = req.params.username;
+//   try {
+//     const stats = await Stats.findOne({ username });
+//     if (!stats) {
+//       return res.status(404).json({ error: 'Stats not found' });
+//     }
+//     res.json(stats);
+//   } catch (error) {
+//     console.error('Error fetching stats:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 // Delete rental endpoint
 app.delete('/remove_listing/:id', async (req, res) => {
@@ -456,44 +456,44 @@ app.delete('/remove_listing/:id', async (req, res) => {
   }
 });
 
-// Example endpoint to add activity (for testing purposes)
-app.post('/api/add-activity', verifyToken, async (req, res) => {
-  try {
-    const activity = new Activity({
-      username: req.body.username,
-      description: req.body.description,
-      date: new Date(),
-    });
-    await activity.save();
-    res.status(201).json(activity);
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
+// // Example endpoint to add activity (for testing purposes)
+// app.post('/api/add-activity', verifyToken, async (req, res) => {
+//   try {
+//     const activity = new Activity({
+//       username: req.body.username,
+//       description: req.body.description,
+//       date: new Date(),
+//     });
+//     await activity.save();
+//     res.status(201).json(activity);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
 
-// Example endpoint to add stats (for testing purposes)
-app.get('/api/stats/:username', verifyToken, async (req, res) => {
-  const username = req.params.username;
-  try {
-    let stats = await Stats.findOne({ username });
+// // Example endpoint to add stats (for testing purposes)
+// app.get('/api/stats/:username', verifyToken, async (req, res) => {
+//   const username = req.params.username;
+//   try {
+//     let stats = await Stats.findOne({ username });
 
-    // If stats do not exist, create default stats
-    if (!stats) {
-      stats = new Stats({
-        username,
-        totalProperties: 0,
-        propertiesSoldOrRented: 0,
-        activeListings: 0,
-      });
-      await stats.save();
-    }
+//     // If stats do not exist, create default stats
+//     if (!stats) {
+//       stats = new Stats({
+//         username,
+//         totalProperties: 0,
+//         propertiesSoldOrRented: 0,
+//         activeListings: 0,
+//       });
+//       await stats.save();
+//     }
 
-    res.json(stats);
-  } catch (error) {
-    console.error('Error fetching stats:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+//     res.json(stats);
+//   } catch (error) {
+//     console.error('Error fetching stats:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
 
 
 app.listen(port, () => {
