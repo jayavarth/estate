@@ -380,7 +380,7 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
 app.get('/wishlist', verifyToken, async (req, res) => {
   const userId = req.query.userId;
   try {
-    const wishlistItems = await Wishlist.find({ userId: userId });
+    const wishlistItems = await Wishlist.find({ user: userId }).populate('listing').populate('rental');
     res.json(wishlistItems);
   } catch (error) {
     console.error('Error fetching wishlist items:', error);
