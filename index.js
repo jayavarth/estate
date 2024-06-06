@@ -363,27 +363,28 @@ app.post('/add-to-wishlist', verifyToken, async (req, res) => {
   try {
     let wishlistItem;
     if (listingId) {
-      wishlistItem = new Wishlist({
-        user: userId,
-        listing: listingId,
-      });
+      wishlistItem = await Wishlist.findOneAndUpdate(
+        { user: userId, listing: listingId },
+        { user: userId, listing: listingId },
+        { upsert: true, new: true }
+      );
     } else if (rentalId) {
-      wishlistItem = new Wishlist({
-        user: userId,
-        rental: rentalId,
-      });
+      wishlistItem = await Wishlist.findOneAndUpdate(
+        { user: userId, rental: rentalId },
+        { user: userId, rental: rentalId },
+        { upsert: true, new: true }
+      );
     } else {
       throw new Error('Either listingId or rentalId must be provided');
     }
 
-    await wishlistItem.save();
-
-    res.status(201).json({ message: 'Added to wishlist successfully' });
+    res.status(201).json({ message: 'Added to wishlist successfully', wishlistItem });
   } catch (error) {
     console.error('Error adding to wishlist:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.get('/wishlist', verifyToken, async (req, res) => {
