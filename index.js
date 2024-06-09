@@ -301,6 +301,25 @@ app.post('/upload-image', upload.array('image'), (req, res) => {
   }
 });
 
+app.get('/added-listings', async (req, res) => {
+  try {
+      const listings = await Listing.find();
+      res.json(listings);
+  } catch (err) {
+      res.status(400).json('Error: ' + err);
+  }
+});
+
+app.get('/added-rentals', async (req, res) => {
+  try {
+      const rentals = await Rental.find();
+      res.json(rentals);
+  } catch (err) {
+      res.status(400).json('Error: ' + err);
+  }
+});
+
+
 // Search listings endpoint
 app.get('/search-listings', async (req, res) => {
   try {
