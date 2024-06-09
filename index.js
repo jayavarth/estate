@@ -421,6 +421,14 @@ app.get('/wishlist', verifyToken, async (req, res) => {
   }
 });
 
+app.get('/user-information', async (req, res) => {
+  try {
+    const users = await User.find({}, '_id name'); // Fetch only _id and name fields
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 
 // Endpoint to get user details by username
