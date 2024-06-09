@@ -301,7 +301,7 @@ app.post('/upload-image', upload.array('image'), (req, res) => {
   }
 });
 
-app.get('/added-listings', async (req, res) => {
+app.get('/homeadded-listings', async (req, res) => {
   try {
       const listings = await Listing.find();
       res.json(listings);
@@ -310,7 +310,7 @@ app.get('/added-listings', async (req, res) => {
   }
 });
 
-app.get('/added-rentals', async (req, res) => {
+app.get('/homeadded-rentals', async (req, res) => {
   try {
       const rentals = await Rental.find();
       res.json(rentals);
