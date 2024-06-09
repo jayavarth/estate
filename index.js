@@ -491,6 +491,32 @@ app.delete('/remove_listing/:id', async (req, res) => {
   }
 });
 
+app.delete('/remove_rental/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("Received request to delete rental with ID:", id);
+
+    // Check if the ID is valid
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ error: 'Invalid rental ID' });
+    }
+
+    // Find and remove the rental
+    const removedRental = await Rental.findByIdAndDelete(id);
+
+    // Check if the rental was found and removed
+    if (removedRental) {
+      res.json({ message: 'Rental removed successfully' });
+    } else {
+      res.status(404).json({ error: 'Rental not found' });
+    }
+  } catch (error) {
+    console.error("Error removing rental:", error);
+    res.status(500).json({ error: 'Failed to remove rental' });
+  }
+});
+
+
 // // Example endpoint to add activity (for testing purposes)
 // app.post('/api/add-activity', verifyToken, async (req, res) => {
 //   try {
