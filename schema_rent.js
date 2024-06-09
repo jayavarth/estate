@@ -50,7 +50,11 @@ const rentSchema = new mongoose.Schema({
     parkingOption: {
         type: String,
         required: true
-    },
+    },images: {
+        type: [String],
+        required: true
+    }
+    ,
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'

@@ -221,6 +221,7 @@ app.get('/all-listings', async (req, res) => {
 });
 
 // Create rental endpoint
+// Create rental endpoint
 app.post('/rentals', verifyToken, async (req, res) => {
   try {
     const {
@@ -234,10 +235,12 @@ app.post('/rentals', verifyToken, async (req, res) => {
       monthlyRent,
       securityDeposit,
       ageOfProperty,
-      images,
       parkingOption,
     } = req.body;
     const userId = req.userId;
+
+    // Extract image URLs from the request body
+    const images = req.body.images || [];
 
     const newRental = new Rental({
       propertyType,
@@ -250,7 +253,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
       monthlyRent,
       securityDeposit,
       ageOfProperty,
-      images,
+      images, // Include the extracted image URLs here
       parkingOption,
       user: userId,
     });
@@ -266,6 +269,7 @@ app.post('/rentals', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 // Retrieve user's rental properties endpoint
 app.get('/added-rentals', verifyToken, async (req, res) => {
