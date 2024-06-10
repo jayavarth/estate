@@ -430,6 +430,32 @@ app.get('/user-information', async (req, res) => {
   }
 });
 
+// Delete wishlist item endpoint
+app.delete('/remove-from-wishlist/:id', verifyToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.userId;
+
+    // Check if the ID is valid
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ error: 'Invalid wishlist item ID' });
+    }
+
+    // Find and remove the wishlist item
+    const removedWishlistItem = await Wishlist.findOneAndDelete({ _id: id, user: userId });
+
+    // Check if the wishlist item was found and removed
+    if (removedWishlistItem) {
+      res.json({ message: 'Wishlist item removed successfully' });
+    } else {
+      res.status(404).json({ error: 'Wishlist item not found' });
+    }
+  } catch (error) {
+    console.error("Error removing wishlist item:", error);
+    res.status(500).json({ error: 'Failed to remove wishlist item' });
+  }
+});
+
 
 // Endpoint to get user details by username
 app.get('/api/profile/:username', verifyToken, async (req, res) => {
