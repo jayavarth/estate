@@ -1,0 +1,380 @@
+.admin-dashboard {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-attachment: scroll;
+    margin-left: 250px;
+}
+
+.admin-nav {
+    background-color: rgb(0, 0, 0, 0.7);
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.admin-nav .admin-content h2 {
+    color: #fff;
+}
+
+.admin-nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+.admin-nav ul li {
+    margin: 10px 0;
+}
+
+.admin-nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    display: block;
+    border-radius: 5px;
+}
+
+.admin-nav ul li a:hover {
+    background-color: rgb(163, 163, 202);
+}
+
+.property-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: black;
+    padding: 20px;
+    border-radius: 8px;
+    width: 60%;
+    height: 80vh;
+    text-align: left;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    display: flex;
+    gap: 20px;
+}
+
+.property-details {
+    width: 60%;
+    position: fixed;
+    top: 300px;
+    left: 10px;
+    color: white;
+}
+
+.property-images {
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.property-images img {
+    width: 150%;
+    border-radius: 1px;
+    border: 1px solid #ddd;
+    justify-content: center;
+}
+
+.property-modal button {
+    background-color: #fff;
+    color: black;
+    border: none;
+    border-radius: 35px;
+    cursor: pointer;
+    border: 2px solid black;
+}
+
+.property-modal button:hover {
+    background-color: #8c8c8c;
+    color: #fff;
+    border: none;
+}
+
+.added-listings {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.added-listings h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.listing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.icon {
+    background-color: white;
+    color: black;
+    border-radius: 150%;
+    border: 2px solid;
+    position: fixed;
+    top: 120px;
+    right: 355px;
+    padding: 15px;
+}
+
+.added-item {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #343a40;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.added-item:hover {
+    transform: scale(1.05);
+}
+
+.added-item h3 {
+    margin-bottom: 10px;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.added-item p {
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 1em;
+}
+
+.added-item .images {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.added-item .images img {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100px;
+    height: 100px;
+}
+
+.expand-images {
+    position: fixed;
+    top: 50px;
+    right: 150px;
+}
+
+.property-images .image-container {
+    width: 100%;
+    height: 450px;
+    overflow: hidden;
+}
+
+.property-images .image-container img {
+    width: auto;
+    height: 100%;
+    max-width: 600px;
+    object-fit: contain;
+}
+
+.image-pagination {
+    position: absolute;
+    top: 70%;
+    left: 900px;
+    right: 10px;
+    transform: translateY(-50%);
+    align-items: center;
+    z-index: 1;
+}
+
+.image-pagination button {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.image-pagination button:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.image-details {
+    display: flex;
+    align-items: center;
+}
+
+.expand-images {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.expand-images img {
+    max-width: 200%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.image-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.image-pagination button {
+    background-color: #4982bf;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.image-pagination button:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.property-details {
+    width: 60%;
+    position: fixed;
+    top: 30px;
+    left: 10px;
+}
+
+.delete-button,
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.delete-button:hover,
+.close-button:hover {
+    background-color: #c82333;
+}
+
+.property-images img {
+    width: 100px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.added-item .images img {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 80px;
+    height: 80px;
+}
+
+.modal-content button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.modal-content button:hover {
+    background-color: #0056b3;
+}
+
+.error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+/* Adjustments to ensure the entire dashboard uses the background color */
+.added-listings {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+.added-listings h2 {
+    margin-bottom: 20px;
+    color: #ffffff;
+    text-align: center;
+    font-size: 1.5em;
+}
+
+.added-listings .listing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Ensure 3 listings per row */
+    gap: 20px;
+}
+
+.added-listings .added-item {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #343a40;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.added-listings .added-item:hover {
+    transform: scale(1.05);
+}
+
+.added-listings .added-item h3 {
+    margin-bottom: 10px;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.added-listings .added-item p {
+    margin-bottom: 5px;
+    color: #555;
+    font-size: 1em;
+}
+
+.added-listings .added-item .images {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+.added-listings .added-item .images img {
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100px; /* Set a fixed width */
+    height: 100px; /* Set a fixed height */
+}

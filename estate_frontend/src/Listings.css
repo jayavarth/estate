@@ -1,0 +1,127 @@
+.admin-listings {
+    display: table;
+    margin: 2px auto; 
+    padding: 20px;
+    border-radius: 10px;
+    position: relative;
+    width: 150%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+body {
+    overflow-y: auto; 
+}
+
+.caption {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.admin-listings label {
+    margin-bottom: 10px;
+    font-weight: bold;
+    width: 150px;
+    text-align: left;
+    display: inline-block;
+    color:white;
+}
+
+.admin-listings select {
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    width: calc(100% - 22px);
+    box-sizing: border-box;
+    background-color: white;
+    color: rgb(0, 0, 0);
+    outline: none;
+}
+
+.admin-listings input[type="text"],
+.admin-listings input[type="tel"],
+.admin-listings input[type="file"],
+.admin-listings input[type="number"] {
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    width: calc(100% - 22px);
+    box-sizing: border-box;
+    background-color: rgba(255, 255, 255, 0.7);
+    color: rgb(0, 0, 0);
+    outline: none;
+}
+
+.flex-container {
+    display: flex;
+    gap: 10px; /* Adjust the gap between items as needed */
+}
+
+
+.admin-listings input[type="file"] {
+    cursor: pointer;
+}
+
+.time-container {
+    display: flex;
+    align-items:flex-end;
+}
+
+.time-container select {
+    margin-right: 10px;
+    margin-left: 15px;
+}
+
+
+.admin-listings button[type="submit"],
+.admin-listings button[type="button"] {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    width: calc(50% - 5px);
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.admin-listings button[type="submit"]:hover,
+.admin-listings button[type="button"]:hover {
+    background-color: #45a049;
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.error {
+    color: #d76146;
+    font-weight: bold;
+}
+
+/* Success Popup Styling */
+.success-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #6cb16e;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 9999;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.success-popup.show {
+    display: block;
+}
