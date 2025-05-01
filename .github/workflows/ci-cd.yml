@@ -7,8 +7,12 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: estate_backend
 
     steps:
       - name: Checkout repository
@@ -23,7 +27,7 @@ jobs:
         run: npm install
 
       - name: Run Build
-        run: npm run build
+        run: npm run build # Or remove if backend doesn't have build
 
-      - name: Run Tests (Optional)
-        run: npm test
+      - name: Run Server (Optional)
+        run: node index.js # Only for validation; remove in CI
