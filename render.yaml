@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: estate-backend
+    env: node
+    rootDir: estate_backend
+    buildCommand: npm install
+    startCommand: node index.js
